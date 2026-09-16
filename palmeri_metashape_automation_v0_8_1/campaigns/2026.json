@@ -1,0 +1,50 @@
+{
+  "campaign_id": "2026",
+  "name": "Poveda-Palmeri 2026 RGB",
+  "sensor": "DJI Zenmuse P1",
+  "kind": "RGB",
+  "output_crs": "EPSG::25830",
+  "camera_reference_crs": "EPSG::4326",
+  "marker_crs": "EPSG::25830",
+  "marker_accuracy_m": [
+    0.02,
+    0.02,
+    0.02
+  ],
+  "marker_projection_accuracy_px": 0.5,
+  "default_gcp_file": "control/gcp_2026.csv",
+  "pilot_date": "2026-05-06",
+  "alignment_preset": "A0",
+  "flights": [
+    {
+      "date": "2026-05-06",
+      "input_dir": "D:\\datos_palmeri\\2026-05-06_Poveda-Palmeri\\1a_RGB",
+      "enabled": true
+    },
+    {
+      "date": "2026-05-14",
+      "input_dir": "D:\\datos_palmeri\\2026-05-14_Poveda-Palmeri\\1a_RGB",
+      "enabled": true
+    },
+    {
+      "date": "2026-06-05",
+      "input_dir": "D:\\datos_palmeri\\2026-06-05_Poveda_Palmeri\\1a_RGB",
+      "enabled": true
+    },
+    {
+      "date": "2026-06-08",
+      "input_dir": "D:\\datos_palmeri\\2026-06-08_Poveda_Palmeri\\1a_RGB\\DJI_202606081409_011_palmeri-poveda-10m-26",
+      "enabled": true
+    },
+    {
+      "date": "2026-06-10",
+      "input_dir": "D:\\datos_palmeri\\2026-06-10_Poveda_Palmeri\\1a_RGB",
+      "enabled": true
+    },
+    {
+      "date": "2026-06-12",
+      "input_dir": "D:\\datos_palmeri\\2026-06-12_Poveda_Palmeri\\1a_RGB",
+      "enabled": true
+    }
+  ]
+}

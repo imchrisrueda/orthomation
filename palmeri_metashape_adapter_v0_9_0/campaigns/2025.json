@@ -1,0 +1,40 @@
+{
+  "campaign_id": "2025",
+  "name": "Poveda-Palmeri 2025 RGB",
+  "status": "READY_FOR_PILOT",
+  "sensor": "DJI Zenmuse P1",
+  "kind": "RGB",
+  "output_crs": "EPSG::25830",
+  "camera_reference_crs": "EPSG::4326",
+  "marker_crs": "EPSG::25830",
+  "final_vertical_reference": "EGM08IGN orthometric height; convert explicitly after ellipsoidal adjustment",
+  "marker_projection_accuracy_px": 0.5,
+  "default_jobxml": "control/jobxml/2025-GPS-ensayopalmeri-poveda.jxl",
+  "jobxml_rules": {
+    "expected_survey_year": 2025,
+    "expected_geoid": "EGM08IGN",
+    "expected_coordinate_tokens": ["UTM", "30 North", "ETRS89"],
+    "required_survey_method": "NetworkFix",
+    "require_no_poor_precision_warning": true
+  },
+  "control_points": {
+    "1": {"label": "E1", "role": "GCP"},
+    "2": {"label": "C2", "role": "CHECK_POINT"},
+    "3": {"label": "E3", "role": "GCP"},
+    "4": {"label": "E4", "role": "GCP"},
+    "5": {"label": "C5", "role": "CHECK_POINT"},
+    "6": {"label": "E6", "role": "GCP"}
+  },
+  "pilot_date": "2025-04-29",
+  "alignment_preset": "MORPHOLOGY_MAX",
+  "flights": [
+    {"date": "2025-04-29", "input_dir": "F:\\datos_palmeri\\2025-04-29_Poveda-Palmeri\\1a_RGB\\DJI_15m_202504291353_011_palmeri29-4-25", "enabled": true},
+    {"date": "2025-05-13", "input_dir": "F:\\datos_palmeri\\2025-05-13_Poveda-Palmeri\\1a_RGB\\DJI_202505131345_008_palmeri-poveda-RGB-12m", "enabled": true},
+    {"date": "2025-05-20", "input_dir": "F:\\datos_palmeri\\2025-05-20_Poveda-Palmeri\\1a_RGB\\DJI_202505201402_001_palmeri-poveda-RGB-12m", "enabled": true},
+    {"date": "2025-05-28", "input_dir": "F:\\datos_palmeri\\2025-05-28_Poveda-Palmeri\\1a_RGB\\DJI_202505281429_007_palmeri-poveda-RGB-12m", "enabled": true},
+    {"date": "2025-06-05", "input_dir": "F:\\datos_palmeri\\2025-06-05_Poveda-Palmeri\\1a_RGB\\DJI_202506051431_003_palmeri-poveda-RGB-12m", "enabled": true},
+    {"date": "2025-06-12", "input_dir": "F:\\datos_palmeri\\2025-06-12_Poveda-Palmeri\\1a_RGB\\DJI_202506121538_011_palmeri-poveda-RGB-12m", "enabled": true},
+    {"date": "2025-06-16", "input_dir": "F:\\datos_palmeri\\2025-06-16_Poveda-Palmeri\\1a_RGB\\DJI_202506161338_026_palmeri-poveda-RGB-12m", "enabled": true},
+    {"date": "2025-06-20", "input_dir": "F:\\datos_palmeri\\2025-06-20_Poveda-Palmeri\\1a_RGB\\DJI_202506201341_001_palmeri-poveda-RGB-12m", "enabled": true}
+  ]
+}

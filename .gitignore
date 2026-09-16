@@ -1,0 +1,27 @@
+# Datos JobXML binarios
+*.jxl
+
+# Artefactos temporales y cachés
+tmp/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Entornos locales
+.venv/
+venv/
+env/
+
+# Salidas generadas por Metashape y validaciones
+*.psx
+*.psx-shm
+*.psx-wal
+*.files/
+*_image_quality.json
+*_optimization_report.json
+
+# Sistema operativo / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

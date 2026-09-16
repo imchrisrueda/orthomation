@@ -1,0 +1,1005 @@
+# -*- coding: utf-8 -*-
+"""Palmeri Metashape Adapter v0.9.0.
+
+JobXML-driven preparation of an aligned, unconstrained MASTER. Manual marker QA,
+controlled branching and optimization are separate stages.
+"""
+
+from pathlib import Path
+from collections import Counter
+from datetime import datetime
+import csv, json, os, traceback, shutil, gc, statistics
+import Metashape
+from orthomation_core import parse_jobxml, validate_p1_xmp, ValidationError
+
+ROOT = Path(__file__).resolve().parent.parent
+GLOBAL_PATH = ROOT / "config" / "global.json"
+
+CAMPAIGN_ID = os.environ.get("PALMERI_CAMPAIGN", "").strip()
+MODE = os.environ.get("PALMERI_MODE", "pilot").strip().lower()
+OVERWRITE = os.environ.get("PALMERI_OVERWRITE", "0") == "1"
+JOBXML_OVERRIDE = os.environ.get("PALMERI_JOBXML", "").strip()
+FLIGHT_DATE = os.environ.get("PALMERI_FLIGHT_DATE", "").strip()
+VALID_MODES = {"inventory", "pilot", "remaining", "all", "single"}
+
+def die(msg):
+    raise RuntimeError(msg)
+
+def load_json(path):
+    if not path.exists():
+        die(f"No existe: {path}")
+    with path.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+def resolve_root_relative(path_str):
+    p = Path(path_str)
+    return p if p.is_absolute() else ROOT / p
+
+def load_configs():
+    if not CAMPAIGN_ID:
+        die("Falta PALMERI_CAMPAIGN.")
+    global_cfg = load_json(GLOBAL_PATH)
+    campaign = load_json(ROOT / "campaigns" / f"{CAMPAIGN_ID}.json")
+    if str(campaign.get("campaign_id")) != CAMPAIGN_ID:
+        die("campaign_id no coincide con PALMERI_CAMPAIGN.")
+    if campaign.get("status", "").startswith("BLOCKED"):
+        die(f"Campaña bloqueada: {campaign.get('status_detail', campaign['status'])}")
+    if OVERWRITE:
+        die("PALMERI_OVERWRITE=1 no está permitido en v0.9.0. Versione o archive explícitamente la salida previa.")
+    return global_cfg, campaign
+
+def campaign_paths(global_cfg, campaign):
+    base = Path(global_cfg["generated_root"]) / campaign["campaign_id"]
+    project_root = base / "projects" / "metashape"
+    work_root = base / "work"
+    log_root = base / "logs"
+    for p in (base, project_root, work_root, log_root):
+        p.mkdir(parents=True, exist_ok=True)
+    return (
+        base,
+        project_root,
+        work_root,
+        log_root,
+        base / "inventory.csv",
+        base / "phase2_projects.csv",
+    )
+
+def log_line(log_path, text):
+    print(text)
+    with log_path.open("a", encoding="utf-8") as f:
+        f.write(text + "\n")
+
+def check_version(global_cfg):
+    version = str(Metashape.app.version)
+    prefix = str(global_cfg["metashape"]["target_version_prefix"])
+    if not version.startswith(prefix):
+        die(f"Metashape {version}; esperado {prefix}.x")
+    return version
+
+def list_files(folder, recursive=False):
+    folder = Path(folder)
+    it = folder.rglob("*") if recursive else folder.glob("*")
+    return sorted((p for p in it if p.is_file()), key=lambda p: p.name.lower())
+
+def make_inventory(global_cfg, campaign, inventory_csv, log_path):
+    ps = global_cfg["photo_selection"]
+    accepted = {x.upper() for x in ps["accepted_extensions"]}
+    selected = {x.upper() for x in ps["selected_extensions"]}
+    recursive = bool(ps["recursive"])
+    fail_mixed = bool(ps["fail_if_jpg_and_dng_coexist"])
+
+    rows = []
+    log_line(log_path, f"=== INVENTARIO CAMPAÑA {campaign['campaign_id']} ===")
+
+    for flight in campaign["flights"]:
+        folder = Path(flight["input_dir"])
+        exists = folder.exists()
+        files = list_files(folder, recursive) if exists else []
+        images = [p for p in files if p.suffix.upper() in accepted]
+        counts = Counter(p.suffix.upper() for p in images)
+        selected_files = [p for p in images if p.suffix.upper() in selected]
+
+        jpg = counts[".JPG"] + counts[".JPEG"]
+        dng = counts[".DNG"]
+        warnings = []
+
+        if not exists:
+            warnings.append("DIRECTORY_NOT_FOUND")
+        elif not images:
+            warnings.append("NO_ACCEPTED_IMAGES")
+        if fail_mixed and jpg and dng:
+            warnings.append("JPG_AND_DNG_PRESENT")
+        if exists and not selected_files:
+            warnings.append("NO_SELECTED_JPG_JPEG")
+
+        jobxml_file = JOBXML_OVERRIDE or flight.get("jobxml") or campaign["default_jobxml"]
+        jobxml_path = resolve_root_relative(jobxml_file)
+        try:
+            parse_jobxml(jobxml_path, campaign["control_points"], campaign["jobxml_rules"])
+        except Exception as exc:
+            warnings.append("INVALID_JOBXML:" + str(exc).replace("\n", " | "))
+        row = {
+            "campaign_id": campaign["campaign_id"],
+            "date": flight["date"],
+            "input_dir": str(folder),
+            "exists": str(exists),
+            "jpg": jpg,
+            "dng": dng,
+            "tif_tiff": counts[".TIF"] + counts[".TIFF"],
+            "selected_count": len(selected_files),
+            "jobxml_file": str(jobxml_path),
+            "warnings": ";".join(warnings),
+        }
+        rows.append(row)
+
+        status = "OK" if not warnings else "REVISAR"
+        log_line(
+            log_path,
+            f"{flight['date']} | {status} | JPG={jpg} | DNG={dng} | "
+            f"seleccionadas={len(selected_files)} | JobXML={jobxml_file}"
+        )
+
+    fields = [
+        "campaign_id","date","input_dir","exists","jpg","dng","tif_tiff",
+        "selected_count","jobxml_file","warnings"
+    ]
+    with inventory_csv.open("w", newline="", encoding="utf-8-sig") as f:
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+        w.writerows(rows)
+
+    return {r["date"]: r for r in rows}
+
+def resolve_jobxml_file(campaign, flight):
+    selected = JOBXML_OVERRIDE or flight.get("jobxml") or campaign["default_jobxml"]
+    return resolve_root_relative(selected)
+
+def load_ground_control(campaign, flight):
+    jobxml_path = resolve_jobxml_file(campaign, flight)
+    job = parse_jobxml(jobxml_path, campaign["control_points"], campaign["jobxml_rules"])
+    coords = {}
+    gcp_ids = []
+    checkpoint_ids = []
+    for point in job["points"].values():
+        label = point["label"]
+        role = point["role"].upper()
+        if role not in {"GCP", "CHECK_POINT"}:
+            die(f"Role inválido para {label}: {role}")
+        coords[label] = {
+            "x": point["easting"],
+            "y": point["northing"],
+            "z": point["h_ellipsoid"],
+            "H_orthometric": point["H_orthometric"],
+            "geoid_separation": point["geoid_separation"],
+            "accuracy": [point["horizontal_precision"], point["horizontal_precision"], point["vertical_precision"]],
+            "role": role,
+            "vertical_status": "CONFIRMED_ELLIPSOIDAL_FROM_JOBXML",
+        }
+        (gcp_ids if role == "GCP" else checkpoint_ids).append(label)
+
+    if not coords:
+        die(f"{jobxml_path} no contiene puntos configurados.")
+    if len(gcp_ids) < 3:
+        die("Se requieren al menos 3 GCP.")
+    if len(checkpoint_ids) < 1:
+        die("Se requiere al menos 1 CHECK_POINT.")
+
+    return coords, gcp_ids, checkpoint_ids, job, jobxml_path
+
+def select_photos(flight, global_cfg):
+    selected = {x.upper() for x in global_cfg["photo_selection"]["selected_extensions"]}
+    recursive = bool(global_cfg["photo_selection"]["recursive"])
+    return [
+        p for p in list_files(flight["input_dir"], recursive)
+        if p.suffix.upper() in selected
+    ]
+
+def write_json(path, payload):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as stream:
+        json.dump(payload, stream, indent=2, ensure_ascii=False)
+
+def metadata_value(metadata, key, default=None):
+    try:
+        value = metadata[key]
+    except (KeyError, TypeError):
+        return default
+    return default if value is None else value
+
+def estimate_image_quality(chunk, config, report_path):
+    quality_cfg = config.get("image_quality", {})
+    if not quality_cfg.get("estimate_before_alignment", True):
+        return {"estimated": False, "warning_count": 0, "rows": []}
+    if not hasattr(Metashape.Tasks, "AnalyzeImages"):
+        die("Metashape no expone Tasks.AnalyzeImages; no se puede ejecutar el QA de imagen configurado.")
+    task = Metashape.Tasks.AnalyzeImages()
+    task.apply(chunk)
+    threshold = float(quality_cfg.get("warning_threshold", 0.5))
+    rows = []
+    for camera in chunk.cameras:
+        raw = metadata_value(camera.meta, "Image/Quality") if camera.meta is not None else None
+        value = None if raw in (None, "") else float(raw)
+        rows.append({
+            "camera": camera.label,
+            "quality": value,
+            "below_warning_threshold": value is not None and value < threshold,
+            "enabled": bool(camera.enabled),
+        })
+    result = {
+        "estimated": True,
+        "warning_threshold": threshold,
+        "automatic_exclusion": False,
+        "warning_count": sum(row["below_warning_threshold"] for row in rows),
+        "rows": rows,
+    }
+    write_json(report_path, result)
+    return result
+
+def set_reference_settings(chunk, campaign):
+    chunk.crs = Metashape.CoordinateSystem(campaign["output_crs"])
+    chunk.camera_crs = Metashape.CoordinateSystem(campaign["camera_reference_crs"])
+    chunk.marker_crs = Metashape.CoordinateSystem(campaign["marker_crs"])
+    chunk.marker_projection_accuracy = float(campaign["marker_projection_accuracy_px"])
+
+def set_location_enabled(reference, value):
+    if hasattr(reference, "location_enabled"):
+        reference.location_enabled = bool(value)
+    elif hasattr(reference, "enabled"):
+        reference.enabled = bool(value)
+    else:
+        die("Reference no expone location_enabled/enabled.")
+
+def location_enabled(reference):
+    if hasattr(reference, "location_enabled"):
+        return bool(reference.location_enabled)
+    return bool(reference.enabled)
+
+def set_rotation_enabled(reference, value):
+    if hasattr(reference, "rotation_enabled"):
+        reference.rotation_enabled = bool(value)
+
+def disable_camera_control(chunk):
+    for camera in chunk.cameras:
+        set_location_enabled(camera.reference, False)
+        set_rotation_enabled(camera.reference, False)
+
+def camera_source_stats(chunk):
+    return {
+        "total": len(chunk.cameras),
+        "with_location": sum(c.reference.location is not None for c in chunk.cameras),
+        "with_accuracy": sum(c.reference.accuracy is not None for c in chunk.cameras),
+        "with_rotation": sum(c.reference.rotation is not None for c in chunk.cameras),
+        "enabled": sum(location_enabled(c.reference) for c in chunk.cameras),
+        "rotation_enabled": sum(bool(getattr(c.reference, "rotation_enabled", False)) for c in chunk.cameras),
+    }
+
+def import_gcp_source(chunk, campaign, coords, gcp_ids, checkpoint_ids):
+    runtime_csv = ROOT / "_runtime_gcp_nxyz.csv"
+
+    with runtime_csv.open("w", newline="", encoding="utf-8-sig") as f:
+        w = csv.writer(f)
+        w.writerow(["label","x","y","z"])
+        for label in gcp_ids + checkpoint_ids:
+            r = coords[label]
+            w.writerow([label, r["x"], r["y"], r["z"]])
+
+    try:
+        chunk.importReference(
+            path=str(runtime_csv),
+            format=Metashape.ReferenceFormatCSV,
+            columns="nxyz",
+            delimiter=",",
+            skip_rows=1,
+            items=Metashape.ReferenceItemsMarkers,
+            crs=Metashape.CoordinateSystem(campaign["marker_crs"]),
+            create_markers=True,
+            load_enabled=False,
+        )
+    finally:
+        try:
+            runtime_csv.unlink()
+        except Exception:
+            pass
+
+    by_label = {m.label: m for m in chunk.markers}
+    failures = []
+
+    for label in gcp_ids + checkpoint_ids:
+        marker = by_label.get(label)
+        if marker is None:
+            failures.append(f"{label}: no creado")
+            continue
+
+        set_location_enabled(marker.reference, False)
+        marker.reference.accuracy = Metashape.Vector(coords[label]["accuracy"])
+        if marker.reference.location is None:
+            failures.append(f"{label}: Source XYZ vacío")
+            continue
+
+        got = tuple(float(marker.reference.location[i]) for i in range(3))
+        exp = (coords[label]["x"], coords[label]["y"], coords[label]["z"])
+        if any(abs(a-b) > 1e-4 for a,b in zip(exp, got)):
+            failures.append(f"{label}: esperado={exp}, cargado={got}")
+
+    if failures:
+        die("Fallo importando GCP/CP:\n" + "\n".join(failures))
+
+def crs_text(crs):
+    if crs is None:
+        return ""
+    try:
+        return str(crs.authority)
+    except Exception:
+        return str(crs)
+
+def normalize_crs_id(value):
+    """
+    Normalize Metashape/API CRS identifiers for robust comparison.
+    Examples:
+      EPSG::25830 -> EPSG:25830
+      EPSG:25830  -> EPSG:25830
+    """
+    if value is None:
+        return ""
+    s = str(value).strip().upper()
+    s = s.replace("EPSG::", "EPSG:")
+    return s
+
+
+def validate_photo_paths(chunk):
+    """
+    Ensure image references are absolute and currently reachable.
+
+    This is critical because the working project is promoted from work/
+    to projects/. Relative paths would change meaning after that move.
+    """
+    issues = []
+    absolute_count = 0
+    existing_count = 0
+
+    for camera in chunk.cameras:
+        if camera.photo is None:
+            issues.append(f"{camera.label}: camera.photo is None")
+            continue
+
+        path_text = str(camera.photo.path)
+        photo_path = Path(path_text)
+
+        if photo_path.is_absolute():
+            absolute_count += 1
+        else:
+            issues.append(f"{camera.label}: relative photo path: {path_text}")
+
+        if photo_path.exists():
+            existing_count += 1
+        else:
+            issues.append(f"{camera.label}: photo file not found: {path_text}")
+
+    if issues:
+        preview = issues[:10]
+        suffix = "" if len(issues) <= 10 else f"\n... +{len(issues)-10} incidencias"
+        raise RuntimeError(
+            "Validación de rutas de imágenes fallida:\n- "
+            + "\n- ".join(preview)
+            + suffix
+        )
+
+    return {
+        "total": len(chunk.cameras),
+        "absolute": absolute_count,
+        "existing": existing_count,
+    }
+
+def validate_pre_alignment(chunk, campaign, coords, gcp_ids, checkpoint_ids):
+    issues = []
+
+    photo_stats = validate_photo_paths(chunk)
+    stats = camera_source_stats(chunk)
+    if stats["total"] == 0:
+        issues.append("No hay cámaras.")
+    if stats["with_location"] != stats["total"]:
+        issues.append(f"Camera Source GPS {stats['with_location']}/{stats['total']}")
+    if stats["enabled"]:
+        issues.append(f"{stats['enabled']} cámaras reference ON")
+    if stats["rotation_enabled"]:
+        issues.append(f"{stats['rotation_enabled']} cámaras rotation reference ON")
+
+    by_label = {m.label: m for m in chunk.markers}
+    for label in gcp_ids + checkpoint_ids:
+        m = by_label.get(label)
+        if m is None:
+            issues.append(f"Falta marcador {label}")
+        else:
+            if m.reference.location is None:
+                issues.append(f"{label}: Source XYZ vacío")
+            if location_enabled(m.reference):
+                issues.append(f"{label}: reference ON")
+
+            got_accuracy = list(m.reference.accuracy) if m.reference.accuracy is not None else []
+            expected_accuracy = coords[label]["accuracy"]
+            if len(got_accuracy) != 3 or any(abs(a-b) > 1e-6 for a,b in zip(got_accuracy, expected_accuracy)):
+                issues.append(f"{label}: accuracy={got_accuracy}; expected={expected_accuracy}")
+
+    exp_output = normalize_crs_id(campaign["output_crs"])
+    exp_camera = normalize_crs_id(campaign["camera_reference_crs"])
+    exp_marker = normalize_crs_id(campaign["marker_crs"])
+
+    got_output = normalize_crs_id(crs_text(chunk.crs))
+    got_camera = normalize_crs_id(crs_text(chunk.camera_crs))
+    got_marker = normalize_crs_id(crs_text(chunk.marker_crs))
+
+    if exp_output != got_output:
+        issues.append(
+            f"Chunk CRS incorrecto: {crs_text(chunk.crs)}; "
+            f"esperado {campaign['output_crs']}"
+        )
+    if exp_camera != got_camera:
+        issues.append(
+            f"Camera CRS incorrecto: {crs_text(chunk.camera_crs)}; "
+            f"esperado {campaign['camera_reference_crs']}"
+        )
+    if exp_marker != got_marker:
+        issues.append(
+            f"Marker CRS incorrecto: {crs_text(chunk.marker_crs)}; "
+            f"esperado {campaign['marker_crs']}"
+        )
+
+    expected_proj = float(campaign["marker_projection_accuracy_px"])
+    got_proj = float(chunk.marker_projection_accuracy)
+    if abs(expected_proj - got_proj) > 1e-9:
+        issues.append(f"Marker projection accuracy {got_proj}; esperado {expected_proj}")
+
+    if issues:
+        die("Validación PRE-ALIGN fallida:\n- " + "\n- ".join(issues))
+
+    return stats
+
+def validate_post_alignment(chunk, campaign, coords, gcp_ids, checkpoint_ids):
+    issues = []
+
+    photo_stats = validate_photo_paths(chunk)
+    aligned = sum(c.transform is not None for c in chunk.cameras)
+    if aligned != len(chunk.cameras):
+        issues.append(f"Alineación incompleta: {aligned}/{len(chunk.cameras)}")
+
+    stats = camera_source_stats(chunk)
+    if stats["with_location"] != stats["total"]:
+        issues.append(f"Camera Source GPS {stats['with_location']}/{stats['total']}")
+    if stats["enabled"]:
+        issues.append(f"{stats['enabled']} cámaras reference ON")
+    if stats["rotation_enabled"]:
+        issues.append(f"{stats['rotation_enabled']} cámaras rotation reference ON")
+
+    by_label = {m.label: m for m in chunk.markers}
+    for label in gcp_ids + checkpoint_ids:
+        m = by_label.get(label)
+        if m is None:
+            issues.append(f"Falta marcador {label}")
+        else:
+            if m.reference.location is None:
+                issues.append(f"{label}: Source XYZ vacío")
+            if location_enabled(m.reference):
+                issues.append(f"{label}: reference ON")
+            got_accuracy = list(m.reference.accuracy) if m.reference.accuracy is not None else []
+            expected_accuracy = coords[label]["accuracy"]
+            if len(got_accuracy) != 3 or any(abs(a-b) > 1e-6 for a,b in zip(got_accuracy, expected_accuracy)):
+                issues.append(f"{label}: accuracy={got_accuracy}; expected={expected_accuracy}")
+
+    if chunk.point_cloud is not None:
+        issues.append("Existe Point Cloud")
+    if chunk.elevation is not None:
+        issues.append("Existe DEM/DSM")
+    if chunk.orthomosaic is not None:
+        issues.append("Existe Orthomosaic")
+
+    if issues:
+        die("Validación POST-ALIGN fallida:\n- " + "\n- ".join(issues))
+
+    tie_points = len(chunk.tie_points.points) if chunk.tie_points is not None else 0
+    return aligned, tie_points, stats
+
+
+def project_files_dir(psx_path):
+    """
+    Metashape .psx projects normally use an associated sibling .files directory.
+    Example:
+      project.psx
+      project.files/
+    """
+    return psx_path.with_suffix(".files")
+
+def release_document(doc, chunk):
+    """
+    Save references are released before filesystem promotion.
+    Metashape has no explicit Document.close() API. Replacing the Document
+    object is the established way to release an opened project in scripts.
+    """
+    try:
+        if doc is not None:
+            doc.save()
+    except Exception:
+        pass
+
+    chunk = None
+    doc = None
+    gc.collect()
+
+    # Creating a fresh Document object helps Metashape release the previous
+    # project handle before moving/renaming its files.
+    fresh = Metashape.Document()
+    fresh = None
+    gc.collect()
+
+def move_with_rollback(src_path, dst_path, moved):
+    if not src_path.exists():
+        return
+
+    dst_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if dst_path.exists():
+        raise RuntimeError(f"Destino ya existe durante promoción: {dst_path}")
+
+    shutil.move(str(src_path), str(dst_path))
+    moved.append((src_path, dst_path))
+
+def rollback_moves(moved):
+    for src_path, dst_path in reversed(moved):
+        try:
+            if dst_path.exists() and not src_path.exists():
+                src_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(dst_path), str(src_path))
+        except Exception:
+            pass
+
+def promote_incomplete_to_master(
+    incomplete_psx,
+    master_psx,
+    global_cfg,
+    campaign,
+    coords,
+    gcp_ids,
+    checkpoint_ids,
+    log_path,
+):
+    """
+    Promote a validated working project to the official MASTER.
+
+    Default behaviour:
+      INCOMPLETE.psx + INCOMPLETE.files/
+          -> MASTER.psx + MASTER.files/
+
+    No second full copy is retained on success.
+
+    If processing.keep_incomplete_on_success=true, Save As is used instead
+    and the working project is intentionally preserved.
+    """
+    processing_cfg = global_cfg.get("processing", {})
+    keep_incomplete = bool(
+        processing_cfg.get("keep_incomplete_on_success", False)
+    )
+    verify_promoted = bool(
+        processing_cfg.get("verify_promoted_master", True)
+    )
+
+    incomplete_files = project_files_dir(incomplete_psx)
+    master_files = project_files_dir(master_psx)
+
+    if master_psx.exists() or master_files.exists():
+        raise RuntimeError(
+            f"No se puede promover: ya existe MASTER o su .files: {master_psx}"
+        )
+
+    if keep_incomplete:
+        # Debug/archival mode: preserve working project and create MASTER copy.
+        source_doc = Metashape.Document()
+        source_doc.open(str(incomplete_psx))
+        source_doc.save(str(master_psx))
+        source_doc = None
+        gc.collect()
+        log_line(
+            log_path,
+            "Promotion mode: COPY (keep_incomplete_on_success=true)"
+        )
+    else:
+        # Normal mode: one project only. Move/rename after all validations pass.
+        moved = []
+        try:
+            # Move .files first and .psx second. If anything fails, rollback.
+            if incomplete_files.exists():
+                move_with_rollback(incomplete_files, master_files, moved)
+            move_with_rollback(incomplete_psx, master_psx, moved)
+        except Exception:
+            rollback_moves(moved)
+            raise
+
+        log_line(
+            log_path,
+            "Promotion mode: MOVE/RENAME "
+            "(keep_incomplete_on_success=false)"
+        )
+
+    # Reopen the promoted MASTER to ensure that the renamed project is readable
+    # and still satisfies the final state checks.
+    if verify_promoted:
+        verify_doc = Metashape.Document()
+        verify_doc.open(str(master_psx), read_only=True)
+        verify_chunk = verify_doc.chunk
+
+        if verify_chunk is None:
+            raise RuntimeError("MASTER promovido no contiene chunk activo.")
+
+        validate_post_alignment(
+            verify_chunk, campaign, coords, gcp_ids, checkpoint_ids
+        )
+
+        verify_chunk = None
+        verify_doc = None
+        gc.collect()
+
+        log_line(log_path, "Promoted MASTER reopen validation: OK")
+
+    # Clean empty per-flight work directories, but retain campaign work root.
+    try:
+        work_rgb_dir = incomplete_psx.parent
+        work_date_dir = work_rgb_dir.parent
+
+        if work_rgb_dir.exists() and not any(work_rgb_dir.iterdir()):
+            work_rgb_dir.rmdir()
+
+        if work_date_dir.exists() and not any(work_date_dir.iterdir()):
+            work_date_dir.rmdir()
+    except Exception as cleanup_error:
+        log_line(
+            log_path,
+            f"WARNING: empty work directory cleanup failed: {cleanup_error}"
+        )
+
+
+def create_master(flight, global_cfg, campaign, project_root, work_root, inv, log_path):
+    date = flight["date"]
+    row = inv[date]
+
+    if row["warnings"]:
+        die(f"{date}: inventario con advertencias: {row['warnings']}")
+
+    photos = select_photos(flight, global_cfg)
+    expected = int(row["selected_count"])
+    if not photos or len(photos) != expected:
+        die(f"{date}: fotos={len(photos)}, inventario={expected}")
+
+    coords, gcp_ids, checkpoint_ids, job, jobxml_path = load_ground_control(campaign, flight)
+    median_ground_h = statistics.median(row["z"] for row in coords.values())
+    xmp_rows = validate_p1_xmp(
+        photos,
+        global_cfg["camera_reference"],
+        median_ground_h=median_ground_h,
+    )
+
+    outdir = project_root / date / "RGB_P1"
+    workdir = work_root / date / "RGB_P1"
+    outdir.mkdir(parents=True, exist_ok=True)
+    workdir.mkdir(parents=True, exist_ok=True)
+
+    stem = f"{date}_RGB_P1_{campaign['alignment_preset']}"
+    incomplete_psx = workdir / f"{stem}_INCOMPLETE.psx"
+    master_psx = outdir / f"{stem}_MASTER.psx"
+
+    if master_psx.exists():
+        die(f"MASTER ya existe: {master_psx}")
+    if incomplete_psx.exists():
+        die(
+            f"Existe un proyecto INCOMPLETE previo: {incomplete_psx}. "
+            "Elimínalo o borra la carpeta de salida de la campaña para reiniciar."
+        )
+
+    log_line(log_path, f"\n=== MASTER {campaign['campaign_id']} / {date} ===")
+    log_line(log_path, f"Working project: {incomplete_psx}")
+    log_line(log_path, f"Final MASTER: {master_psx}")
+    log_line(log_path, f"JobXML: {jobxml_path}")
+    log_line(log_path, f"JobXML SHA256: {job['sha256']}")
+
+    # IMPORTANT: the work project is later moved/renamed to MASTER.
+    # Store image references as absolute paths so promotion cannot break them.
+    if global_cfg.get("processing", {}).get("store_photo_paths_absolute", True):
+        Metashape.app.settings.project_absolute_paths = True
+        log_line(log_path, "Photo path storage: ABSOLUTE")
+
+    doc = Metashape.Document()
+    doc.save(str(incomplete_psx))
+    chunk = doc.addChunk()
+    chunk.label = f"{campaign['campaign_id']}_{stem}_WORK"
+    chunk.meta["orthomation/version"] = "0.9.0"
+    chunk.meta["orthomation/campaign_id"] = campaign["campaign_id"]
+    chunk.meta["orthomation/flight_date"] = date
+    chunk.meta["orthomation/jobxml_sha256"] = job["sha256"]
+    chunk.meta["orthomation/jobxml_path"] = str(jobxml_path.resolve())
+    chunk.meta["orthomation/vertical_adjustment"] = "ELLIPSOIDAL"
+    chunk.meta["orthomation/final_vertical_reference"] = campaign["final_vertical_reference"]
+    chunk.meta["orthomation/stage"] = "WORK_PRE_ALIGNMENT"
+
+    # 1. Set settings before image import.
+    set_reference_settings(chunk, campaign)
+
+    # 2. Load images WITH Source GPS/XMP.
+    cam_cfg = global_cfg["camera_reference"]
+    chunk.addPhotos(
+        filenames=[str(p) for p in photos],
+        strip_extensions=False,
+        load_reference=bool(cam_cfg["load_source_coordinates"]),
+        load_xmp_calibration=True,
+        load_xmp_orientation=bool(cam_cfg["load_xmp_orientation"]),
+        load_xmp_accuracy=bool(cam_cfg["load_xmp_accuracy"]),
+        load_xmp_antenna=bool(cam_cfg["load_xmp_antenna"]),
+    )
+
+    # Defensive normalization: addPhotos receives absolute paths. Keep them
+    # explicitly absolute in each Photo object as well.
+    for camera in chunk.cameras:
+        if camera.photo is not None:
+            camera.photo.path = str(Path(camera.photo.path).resolve())
+
+    maximum_sigma = float(cam_cfg["maximum_position_sigma_m"])
+    bad_camera_accuracy = []
+    for camera in chunk.cameras:
+        accuracy = camera.reference.accuracy
+        values = [] if accuracy is None else [float(accuracy[i]) for i in range(3)]
+        if len(values) != 3 or any(value <= 0 or value > maximum_sigma for value in values):
+            bad_camera_accuracy.append(f"{camera.label}: {values}")
+    if bad_camera_accuracy:
+        die("Camera XMP accuracy missing/invalid:\n- " + "\n- ".join(bad_camera_accuracy[:20]))
+
+    quality_report = estimate_image_quality(
+        chunk,
+        global_cfg,
+        outdir / f"{stem}_image_quality.json",
+    )
+
+    # Reassert reference settings after metadata import.
+    set_reference_settings(chunk, campaign)
+    disable_camera_control(chunk)
+
+    # 3. Import GCP/CP BEFORE alignment.
+    import_gcp_source(chunk, campaign, coords, gcp_ids, checkpoint_ids)
+    set_reference_settings(chunk, campaign)
+    disable_camera_control(chunk)
+
+    # 4. Validate and checkpoint PRE-ALIGN state.
+    pre_stats = validate_pre_alignment(
+        chunk, campaign, coords, gcp_ids, checkpoint_ids
+    )
+    preflight_audit = {
+        "adapter_version": "0.9.0",
+        "campaign_id": campaign["campaign_id"],
+        "flight_date": date,
+        "alignment_preset": campaign["alignment_preset"],
+        "jobxml": job,
+        "camera_xmp": {
+            "count": len(xmp_rows),
+            "altitude_type": sorted(set(row["altitude_type"] for row in xmp_rows)),
+            "rtk_flags": sorted(set(row["rtk_flag"] for row in xmp_rows)),
+            "surveying_modes": sorted(set(row["surveying_mode"] for row in xmp_rows)),
+            "sigma_lon_range_m": [min(row["sigma_lon"] for row in xmp_rows), max(row["sigma_lon"] for row in xmp_rows)],
+            "sigma_lat_range_m": [min(row["sigma_lat"] for row in xmp_rows), max(row["sigma_lat"] for row in xmp_rows)],
+            "sigma_h_range_m": [min(row["sigma_h"] for row in xmp_rows), max(row["sigma_h"] for row in xmp_rows)],
+            "camera_ground_height_difference_range_m": [
+                min(row["ellipsoidal_height_difference_to_ground_m"] for row in xmp_rows),
+                max(row["ellipsoidal_height_difference_to_ground_m"] for row in xmp_rows),
+            ],
+        },
+        "image_quality": {
+            "estimated": quality_report["estimated"],
+            "warning_threshold": quality_report.get("warning_threshold"),
+            "warning_count": quality_report["warning_count"],
+            "automatic_exclusion": False,
+        },
+        "manual_gate": "Review image-quality warnings and mark all configured GCP/CP before branching.",
+    }
+    write_json(outdir / f"{stem}_preflight_audit.json", preflight_audit)
+    doc.save()
+
+    log_line(
+        log_path,
+        f"PRE-ALIGN OK | cameras={pre_stats['total']} | "
+        f"Source GPS={pre_stats['with_location']} | "
+        f"markers={len(gcp_ids) + len(checkpoint_ids)}"
+    )
+
+    # 5. Alignment. Camera positions are present but are not bundle constraints.
+    preset_name = campaign["alignment_preset"]
+    a = global_cfg["metashape"]["alignment_presets"][preset_name]
+
+    chunk.matchPhotos(
+        downscale=int(a["downscale"]),
+        generic_preselection=bool(a["generic_preselection"]),
+        reference_preselection=bool(a["reference_preselection"]),
+        filter_stationary_points=bool(a["filter_stationary_points"]),
+        keypoint_limit=int(a["keypoint_limit"]),
+        tiepoint_limit=int(a["tiepoint_limit"]),
+        guided_matching=bool(a["guided_matching"]),
+        reset_matches=True,
+    )
+    doc.save()
+
+    chunk.alignCameras(
+        adaptive_fitting=bool(a["adaptive_fitting"]),
+        reset_alignment=False,
+    )
+
+    set_reference_settings(chunk, campaign)
+    disable_camera_control(chunk)
+
+    # 6. Full validation before a MASTER is allowed to exist.
+    aligned, tie_points, stats = validate_post_alignment(
+        chunk, campaign, coords, gcp_ids, checkpoint_ids
+    )
+
+    # 7. Finalize the working project, release Metashape file handles,
+    #    and promote INCOMPLETE -> MASTER without retaining a duplicate
+    #    unless explicitly requested in config/global.json.
+    chunk.label = f"{campaign['campaign_id']}_{stem}_MASTER"
+    chunk.meta["orthomation/stage"] = "MASTER_ALIGNED_AWAITING_MANUAL_MARKING"
+    doc.save()
+
+    # Release references before moving the .psx/.files pair.
+    release_document(doc, chunk)
+    chunk = None
+    doc = None
+
+    promote_incomplete_to_master(
+        incomplete_psx=incomplete_psx,
+        master_psx=master_psx,
+        global_cfg=global_cfg,
+        campaign=campaign,
+        coords=coords,
+        gcp_ids=gcp_ids,
+        checkpoint_ids=checkpoint_ids,
+        log_path=log_path,
+    )
+
+    log_line(log_path, f"MASTER CREATED: {master_psx}")
+    log_line(log_path, f"Alineadas: {aligned}/{stats['total']}")
+    log_line(log_path, f"Tie points: {tie_points}")
+    log_line(
+        log_path,
+        f"Camera Source GPS: {stats['with_location']}/{stats['total']} | "
+        f"XMP accuracy: {stats['with_accuracy']}/{stats['total']} | "
+        f"camera reference enabled={stats['enabled']}"
+    )
+    log_line(
+        log_path,
+        f"Photo paths: absolute/existing = {stats['total']}/{stats['total']}"
+    )
+    log_line(
+        log_path,
+        f"CRS | chunk={campaign['output_crs']} | "
+        f"camera={campaign['camera_reference_crs']} | "
+        f"marker={campaign['marker_crs']}"
+    )
+    log_line(
+        log_path,
+        f"Marker accuracy=per-point JobXML Horizontal/Horizontal/Vertical | "
+        f"projection={campaign['marker_projection_accuracy_px']} px"
+    )
+    log_line(log_path, "GCP/CP loaded before alignment: YES")
+    log_line(log_path, f"Reference preselection: {bool(a['reference_preselection'])}")
+    log_line(log_path, "Optimize Cameras: NOT RUN")
+
+    return {
+        "campaign_id": campaign["campaign_id"],
+        "date": date,
+        "jobxml_file": str(jobxml_path),
+        "jobxml_sha256": job["sha256"],
+        "project": str(master_psx),
+        "working_project": (
+            str(incomplete_psx)
+            if global_cfg.get("processing", {}).get(
+                "keep_incomplete_on_success", False
+            )
+            else ""
+        ),
+        "images": stats["total"],
+        "aligned": aligned,
+        "tie_points": tie_points,
+        "camera_source_xyz": stats["with_location"],
+        "camera_xmp_accuracy": stats["with_accuracy"],
+        "camera_reference_enabled": stats["enabled"],
+        "status": "OK",
+        "error": "",
+    }
+
+def write_summary(path, rows):
+    fields = [
+        "campaign_id","date","jobxml_file","jobxml_sha256","project","working_project",
+        "images","aligned","tie_points","camera_source_xyz",
+        "camera_xmp_accuracy","camera_reference_enabled","status","error"
+    ]
+    previous = {}
+    if path.exists():
+        with path.open("r", encoding="utf-8-sig", newline="") as f:
+            for row in csv.DictReader(f):
+                previous[row["date"]] = row
+    for row in rows:
+        previous[row["date"]] = row
+
+    with path.open("w", newline="", encoding="utf-8-sig") as f:
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+        for date in sorted(previous):
+            w.writerow(previous[date])
+
+def main():
+    if MODE not in VALID_MODES:
+        die(f"PALMERI_MODE inválido: {MODE}")
+
+    global_cfg, campaign = load_configs()
+    (
+        _,
+        project_root,
+        work_root,
+        log_root,
+        inventory_csv,
+        summary_csv,
+    ) = campaign_paths(global_cfg, campaign)
+
+    version = check_version(global_cfg)
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_path = log_root / f"{stamp}_{MODE}.log"
+
+    log_line(log_path, "Palmeri Metashape Adapter v0.9.0")
+    log_line(log_path, f"Campaign: {campaign['campaign_id']} — {campaign['name']}")
+    log_line(log_path, f"Metashape: {version}")
+    log_line(log_path, f"Mode: {MODE}")
+
+    inv = make_inventory(global_cfg, campaign, inventory_csv, log_path)
+    if MODE == "inventory":
+        return
+
+    flights = [f for f in campaign["flights"] if f.get("enabled", True)]
+    if MODE == "pilot":
+        flights = [f for f in flights if f["date"] == campaign["pilot_date"]]
+    elif MODE == "remaining":
+        flights = [f for f in flights if f["date"] != campaign["pilot_date"]]
+    elif MODE == "single":
+        if not FLIGHT_DATE:
+            die("PALMERI_FLIGHT_DATE es obligatorio en modo single.")
+        flights = [f for f in flights if f["date"] == FLIGHT_DATE]
+        if not flights:
+            die(f"No existe o no está habilitado el vuelo {FLIGHT_DATE}.")
+
+    results = []
+
+    for flight in flights:
+        try:
+            results.append(
+                create_master(
+                    flight, global_cfg, campaign,
+                    project_root, work_root, inv, log_path
+                )
+            )
+        except Exception as exc:
+            traceback.print_exc()
+            log_line(log_path, f"ERROR {flight['date']}: {exc}")
+            results.append({
+                "campaign_id": campaign["campaign_id"],
+                "date": flight["date"],
+                "jobxml_file": str(resolve_jobxml_file(campaign, flight)),
+                "jobxml_sha256": "",
+                "project": "",
+                "working_project": "",
+                "images": "",
+                "aligned": "",
+                "tie_points": "",
+                "camera_source_xyz": "",
+                "camera_xmp_accuracy": "",
+                "camera_reference_enabled": "",
+                "status": "ERROR",
+                "error": str(exc),
+            })
+            if MODE in {"pilot", "single"}:
+                break
+
+    write_summary(summary_csv, results)
+    log_line(log_path, f"Resumen: {summary_csv}")
+
+if __name__ == "__main__":
+    main()

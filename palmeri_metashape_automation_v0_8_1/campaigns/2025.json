@@ -1,0 +1,60 @@
+{
+  "campaign_id": "2025",
+  "name": "Poveda-Palmeri 2025 RGB",
+  "sensor": "DJI Zenmuse P1",
+  "kind": "RGB",
+  "output_crs": "EPSG::25830",
+  "camera_reference_crs": "EPSG::4326",
+  "marker_crs": "EPSG::25830",
+  "marker_accuracy_m": [
+    0.02,
+    0.02,
+    0.02
+  ],
+  "marker_projection_accuracy_px": 0.5,
+  "default_gcp_file": "control/gcp_2025.csv",
+  "pilot_date": "2025-04-29",
+  "alignment_preset": "A0",
+  "flights": [
+    {
+      "date": "2025-04-29",
+      "input_dir": "F:\\datos_palmeri\\2025-04-29_Poveda-Palmeri\\1a_RGB\\DJI_15m_202504291353_011_palmeri29-4-25",
+      "enabled": true
+    },
+    {
+      "date": "2025-05-13",
+      "input_dir": "F:\\datos_palmeri\\2025-05-13_Poveda-Palmeri\\1a_RGB\\DJI_202505131345_008_palmeri-poveda-RGB-12m",
+      "enabled": true
+    },
+    {
+      "date": "2025-05-20",
+      "input_dir": "F:\\datos_palmeri\\2025-05-20_Poveda-Palmeri\\1a_RGB\\DJI_202505201402_001_palmeri-poveda-RGB-12m",
+      "enabled": true
+    },
+    {
+      "date": "2025-05-28",
+      "input_dir": "F:\\datos_palmeri\\2025-05-28_Poveda-Palmeri\\1a_RGB\\DJI_202505281429_007_palmeri-poveda-RGB-12m",
+      "enabled": true
+    },
+    {
+      "date": "2025-06-05",
+      "input_dir": "F:\\datos_palmeri\\2025-06-05_Poveda-Palmeri\\1a_RGB\\DJI_202506051431_003_palmeri-poveda-RGB-12m",
+      "enabled": true
+    },
+    {
+      "date": "2025-06-12",
+      "input_dir": "F:\\datos_palmeri\\2025-06-12_Poveda-Palmeri\\1a_RGB\\DJI_202506121538_011_palmeri-poveda-RGB-12m",
+      "enabled": true
+    },
+    {
+      "date": "2025-06-16",
+      "input_dir": "F:\\datos_palmeri\\2025-06-16_Poveda-Palmeri\\1a_RGB\\DJI_202506161338_026_palmeri-poveda-RGB-12m",
+      "enabled": true
+    },
+    {
+      "date": "2025-06-20",
+      "input_dir": "F:\\datos_palmeri\\2025-06-20_Poveda-Palmeri\\1a_RGB\\DJI_202506201341_001_palmeri-poveda-RGB-12m",
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "schema_version": "0.9.0",
+  "package_name": "Palmeri Metashape Adapter",
+  "generated_root": "F:\\datos_palmeri\\_geomatics_automation",
+  "photo_selection": {
+    "recursive": false,
+    "accepted_extensions": [".JPG", ".JPEG", ".DNG", ".TIF", ".TIFF"],
+    "selected_extensions": [".JPG", ".JPEG"],
+    "fail_if_jpg_and_dng_coexist": true
+  },
+  "camera_reference": {
+    "load_source_coordinates": true,
+    "load_xmp_accuracy": true,
+    "load_xmp_orientation": true,
+    "load_xmp_antenna": false,
+    "require_p1_rtk_fixed": true,
+    "require_surveying_mode": true,
+    "maximum_position_sigma_m": 0.5,
+    "minimum_camera_agl_m": 2.0,
+    "maximum_camera_agl_m": 250.0
+  },
+  "image_quality": {
+    "estimate_before_alignment": true,
+    "warning_threshold": 0.5,
+    "automatic_exclusion": false
+  },
+  "validation": {
+    "minimum_projections_per_marker": 5,
+    "manual_minimum_if_fewer_visible": 3,
+    "require_all_camera_source_xyz": true,
+    "require_all_camera_xmp_accuracy": true,
+    "require_camera_location_off_in_master": true,
+    "require_camera_rotation_off": true,
+    "require_marker_reference_off_during_marking": true,
+    "require_no_derived_products": true,
+    "check_crs": true,
+    "check_marker_accuracy": true,
+    "coordinate_tolerance_m": 0.002,
+    "accuracy_tolerance_m": 0.000001
+  },
+  "metashape": {
+    "target_version_prefix": "2.3",
+    "alignment_presets": {
+      "MORPHOLOGY_MAX": {
+        "downscale": 1,
+        "generic_preselection": true,
+        "reference_preselection": false,
+        "filter_stationary_points": false,
+        "keypoint_limit": 40000,
+        "tiepoint_limit": 10000,
+        "guided_matching": true,
+        "adaptive_fitting": true
+      },
+      "BASELINE_A0": {
+        "downscale": 1,
+        "generic_preselection": true,
+        "reference_preselection": false,
+        "filter_stationary_points": false,
+        "keypoint_limit": 40000,
+        "tiepoint_limit": 10000,
+        "guided_matching": false,
+        "adaptive_fitting": true
+      }
+    }
+  },
+  "optimization": {
+    "fit_f": true,
+    "fit_cx": true,
+    "fit_cy": true,
+    "fit_b1": false,
+    "fit_b2": false,
+    "fit_k1": true,
+    "fit_k2": true,
+    "fit_k3": true,
+    "fit_k4": false,
+    "fit_p1": true,
+    "fit_p2": true,
+    "fit_corrections": false,
+    "adaptive_fitting": true,
+    "tiepoint_covariance": true
+  },
+  "processing": {
+    "keep_incomplete_on_success": false,
+    "verify_promoted_master": true,
+    "store_photo_paths_absolute": true,
+    "overwrite_policy": "forbid"
+  }
+}

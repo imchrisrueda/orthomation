@@ -1,0 +1,4 @@
+Palmeri Metashape Adapter v0.9.0
+Architecture: JobXML-driven, campaign/flight configurable, manual GCP QA gate
+Target: Agisoft Metashape Professional 2.3.x
+Vertical adjustment: ellipsoidal; orthometric conversion is a separate output step
