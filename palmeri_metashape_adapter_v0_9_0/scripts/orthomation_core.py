@@ -3,6 +3,7 @@
 from datetime import datetime
 from hashlib import sha256
 from pathlib import Path
+import json
 import math
 import re
 import xml.etree.ElementTree as ET
@@ -10,6 +11,35 @@ import xml.etree.ElementTree as ET
 
 class ValidationError(RuntimeError):
     pass
+
+
+def _flatten_numeric(value):
+    """Return numeric values from flat or row-iterable Metashape objects."""
+    try:
+        return [float(value)]
+    except (TypeError, ValueError):
+        pass
+
+    try:
+        items = iter(value)
+    except TypeError as exc:
+        raise TypeError(f"Unsupported numeric container: {type(value).__name__}") from exc
+
+    flattened = []
+    for item in items:
+        flattened.extend(_flatten_numeric(item))
+    return flattened
+
+
+def transform_fingerprint(chunk):
+    """Hash camera transforms across Metashape matrix iteration variants."""
+    rows = []
+    for camera in sorted(chunk.cameras, key=lambda item: item.label):
+        transform = camera.transform
+        values = [] if transform is None else _flatten_numeric(transform)
+        rows.append((camera.label, values))
+    payload = json.dumps(rows, separators=(",", ":"), ensure_ascii=True).encode("ascii")
+    return sha256(payload).hexdigest()
 
 
 def sha256_file(path):

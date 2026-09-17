@@ -6,7 +6,18 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from orthomation_core import ValidationError, parse_jobxml, read_dji_xmp
+from orthomation_core import ValidationError, parse_jobxml, read_dji_xmp, transform_fingerprint
+
+
+class FakeCamera:
+    def __init__(self, label, transform):
+        self.label = label
+        self.transform = transform
+
+
+class FakeChunk:
+    def __init__(self, cameras):
+        self.cameras = cameras
 
 
 class CoreTests(unittest.TestCase):
@@ -66,6 +77,19 @@ class CoreTests(unittest.TestCase):
             path.unlink(missing_ok=True)
         self.assertEqual(xmp["drone-dji:AltitudeType"], "RtkAlt")
         self.assertEqual(xmp["drone-dji:RtkFlag"], "50")
+
+    def test_transform_fingerprint_accepts_flat_metashape_matrix_iteration(self):
+        flat = FakeChunk([FakeCamera("camera", [1.0, 2.0, 3.0, 4.0])])
+        nested = FakeChunk([FakeCamera("camera", [[1.0, 2.0], [3.0, 4.0]])])
+        self.assertEqual(transform_fingerprint(flat), transform_fingerprint(nested))
+
+    def test_transform_fingerprint_is_camera_order_independent(self):
+        first = FakeCamera("A", None)
+        second = FakeCamera("B", [1.0, 0.0, 0.0, 1.0])
+        self.assertEqual(
+            transform_fingerprint(FakeChunk([first, second])),
+            transform_fingerprint(FakeChunk([second, first])),
+        )
 
 
 if __name__ == "__main__":

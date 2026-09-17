@@ -1,5 +1,12 @@
 # Changelog
 
+## Corrección — 2026-09-17 (huella de transformaciones)
+
+- Adapta la huella SHA-256 de transformaciones a Metashape 2.3, cuya matriz puede iterarse como una secuencia plana de números.
+- Centraliza la serialización para que creación de ramas, preflight y optimización calculen exactamente la misma huella.
+- Recarga el módulo compartido al ejecutar scripts desde una sesión de Metashape que ya lo tenía en memoria.
+- Añade pruebas para matrices planas, matrices iterables por filas y orden estable de cámaras.
+
 ## Documentación — 2026-09-17 (guía del repositorio)
 
 - Añade README raíz con propósito, mapa del repositorio, estado, límites y referencias para empezar.

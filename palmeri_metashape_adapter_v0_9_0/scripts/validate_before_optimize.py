@@ -1,12 +1,16 @@
 """Read-only pre-optimization validation for a controlled branch."""
 
-from hashlib import sha256
 from pathlib import Path
 import datetime
+import importlib
 import json
 import Metashape
 
-from orthomation_core import parse_jobxml
+import orthomation_core
+
+orthomation_core = importlib.reload(orthomation_core)
+parse_jobxml = orthomation_core.parse_jobxml
+transform_fingerprint = orthomation_core.transform_fingerprint
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -36,15 +40,6 @@ def meta_value(owner, key, default=None):
     except (KeyError, TypeError):
         return default
     return default if value is None else value
-
-
-def transform_fingerprint(chunk):
-    rows = []
-    for camera in sorted(chunk.cameras, key=lambda item: item.label):
-        transform = camera.transform
-        values = [] if transform is None else [float(value) for row in transform for value in row]
-        rows.append((camera.label, values))
-    return sha256(json.dumps(rows, separators=(",", ":")).encode("ascii")).hexdigest()
 
 
 def main():

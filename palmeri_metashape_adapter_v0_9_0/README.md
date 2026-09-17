@@ -39,6 +39,8 @@ Los lanzadores `.bat` establecen las variables de campaña y modo, y ejecutan `s
 8. Con cada rama validada como chunk activo, ejecutar `scripts/optimize_branch.py`. El script exige un informe pre-optimización `PASS` reciente y aplica los mismos parámetros bloqueados a ambas ramas.
 9. Revisar ambos informes de optimización. La extracción automatizada de métricas GCP/CP y el criterio de selección siguen pendientes; no se debe dar por elegida una rama ni generar productos finales. Los dos CP disponibles sólo sustentan una evaluación exploratoria.
 
+Los scripts que actúan sobre un proyecto abierto (`prepare_branches.py`, `validate_before_optimize.py` y `optimize_branch.py`) se ejecutan desde el ejecutor de scripts de Metashape, con el proyecto correcto abierto y el MASTER o la rama pertinente como chunk activo. No los ejecutes con Python de sistema.
+
 `launchers/2025_04_remaining.bat` procesa los vuelos restantes y sólo debe usarse después de aceptar el piloto. `launchers/2025_05_validate_all.bat` valida el marcado para todos los MASTER disponibles; no reemplaza la validación de ramas previa a optimizar.
 
 `launchers/run_campaign.bat` ofrece inventario, piloto, validación del piloto, vuelos restantes, validación completa y vuelo individual. El modo individual pide fecha y permite un override de JobXML. La acción del lanzador no omite las puertas manuales del flujo.
@@ -75,6 +77,12 @@ python -m unittest discover -s tests -v
 ```
 
 Las pruebas puras verifican el parser JobXML y lectura XMP de ejemplo; no ejecutan Metashape ni procesan fotografías. Los scripts `tests/metashape_smoke.py` y `tests/metashape_preflight_smoke.py` requieren Metashape y datos locales.
+
+Las pruebas unitarias incluyen la huella de transformaciones con matrices planas y anidadas, además de verificar que el resultado no depende del orden de las cámaras.
+
+## Solución de problemas
+
+Si aparece `cannot import name 'transform_fingerprint' from 'orthomation_core'`, verifica que `scripts/orthomation_core.py`, `scripts/prepare_branches.py`, `scripts/validate_before_optimize.py` y `scripts/optimize_branch.py` sean de la misma versión actualizada. La huella ahora se define en el módulo compartido, y esos scripts recargan el módulo al iniciar para evitar reutilizar una copia anterior en la sesión de Metashape. Ese error de importación ocurre antes de entrar en `main()`; tras actualizar los archivos, vuelve a ejecutar el script con el MASTER validado activo. Si el mensaje persiste, cierra cualquier sesión de Metashape que esté ejecutando una copia antigua del paquete y abre el paquete actualizado.
 
 ## Parámetros geomáticos resumidos
 
