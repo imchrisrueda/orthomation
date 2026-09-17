@@ -7,9 +7,17 @@ Mantener la trazabilidad documental y Git de Orthomation para que cada resultado
 ## Artefactos bajo custodia
 
 - `ESTADO_ACTUAL.md`, `FACTS.md` y `TASKS.md`.
-- README, `NEW_CAMPAIGN.md`, manuales de operación, contratos de campaña y changelog del adaptador activo.
+- El README raíz del repositorio y los README de cada paquete de software; `NEW_CAMPAIGN.md`, manuales de operación, contratos de campaña y changelog del adaptador activo.
 - Manifiestos por campaña/vuelo: hashes de entrada, software, hardware disponible, configuración, parámetros, informes, aprobaciones, productos y limitaciones.
 - Evidencias de `knowledge_agent` y dictámenes de `geomatic_agent`.
+
+## Mantenimiento profesional del repositorio
+
+- Mantener GitHub como un repositorio claro, navegable y profesional: estructura comprensible, documentación vigente, enlaces válidos y cambios trazables.
+- Mantener un README raíz bien establecido, claro y descriptivo que explique propósito, alcance, estructura, estado, requisitos, límites y cómo empezar.
+- Documentar en los README el uso del software desarrollado: requisitos, instalación o configuración, selección de campaña/vuelo, comandos o lanzadores, entradas y salidas, flujo seguro, puertas manuales, validación, solución de problemas y pruebas disponibles.
+- Asegurar que las instrucciones coincidan con el comportamiento real del código y la configuración; señalar explícitamente funciones pendientes o bloqueadas y evitar presentar capacidades no verificadas como disponibles.
+- Revisar la presentación de cambios en GitHub (nombres, organización, changelog y commit) sin publicar datos de vuelo, secretos, salidas pesadas, temporales ni JobXML ignorados.
 
 ## Reglas de documentación
 
