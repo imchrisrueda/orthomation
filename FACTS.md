@@ -1,6 +1,6 @@
 # Facts del proyecto Orthomation
 
-Fecha de corte: 2026-09-16.
+Fecha de corte: 2026-09-17.
 
 Este documento distingue hechos confirmados, decisiones metodológicas adoptadas y cuestiones todavía abiertas. No convierte una hipótesis en hecho.
 
@@ -115,12 +115,13 @@ La métrica principal de exactitud externa son los CP. Los residuos de GCP descr
 
 ## 10. Estado 2026
 
-- El fichero llamado `2026-GPS-ensayopalmeri-poveda.jxl` añadido al workspace tiene la misma huella SHA-256 y el mismo contenido que el de 2025.
-- Contiene observaciones del 29/04/2025, no un levantamiento 2026.
-- La campaña 2026 permanece bloqueada hasta sustituirlo por el JobXML correcto.
+- El JobXML añadido al workspace el 17/09/2026 es distinto del de 2025. SHA-256 2026: `3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5`; SHA-256 2025: `877c73e9a409d41c1262adf6921713d009db4a395d977550755b15d8f2b63d18`.
+- El parser del adaptador v0.9.0 valida el candidato de la raíz del repo cuando se proporciona esa ruta explícitamente: seis puntos, observaciones de 2026, JobXML 5.72, ETRS89 / UTM 30 North y geoide EGM08IGN.
+- La ruta configurada como `default_jobxml` en `campaigns/2026.json` aún apunta a la copia local antigua en `control/jobxml/`; esta tiene la misma huella que el JobXML 2025 y falla la regla de año. El conjunto actual de pruebas confirma que la copia configurada se rechaza para 2026.
+- Hecho confirmado: el candidato recibido pasa validación automática, pero no es todavía el archivo que selecciona por defecto la campaña. Pendiente: revisión geomática independiente, aceptación de coordenadas, identificadores/roles, método GNSS, precisiones y advertencias, y después actualizar la copia local configurada.
+- El JobXML y los datos de control permanecen excluidos del repositorio remoto. La huella permite verificar localmente qué versión se revisó sin publicar el contenido.
 
 ## 11. Fuentes locales contrastadas
 
 - `manuales/metashape-pro_2_3_en.pdf`: alineación, CRS, alturas, GCP/CP, precisiones y optimización.
 - `manuales/pix4D_manual_4_1.pdf`: adquisición, solape y flujo Pix4Dmapper 4.1. La implementación Pix4D queda fuera de v0.9.0.
-

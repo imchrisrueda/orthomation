@@ -1,6 +1,6 @@
 # Tareas del proyecto Orthomation
 
-Fecha de corte: 2026-09-16.
+Fecha de corte: 2026-09-17.
 
 ## Completado
 
@@ -20,11 +20,12 @@ Fecha de corte: 2026-09-16.
 - [x] Añadir puerta de marcado y ramas `GCP_ONLY/GCP_P1` no repetibles.
 - [x] Añadir huellas de transformación para detectar cambios antes de optimizar.
 - [x] Añadir pruebas unitarias del parser JobXML, año y XMP.
-- [x] Bloquear campaña 2026 por JobXML incorrecto.
+- [x] Bloquear campaña 2026 mientras el JobXML está pendiente de verificación.
 
 ## Siguiente validación inmediata
 
-- [ ] Sustituir el JobXML 2026 duplicado por el fichero real.
+- [x] Recibir JobXML 2026 distinto del de 2025 y pasar las reglas automáticas del parser (seis puntos; año, CRS y geoide conformes).
+- [ ] Obtener dictamen geomático independiente para el JobXML 2026 y, si se acepta, sustituir la copia antigua local de `control/jobxml/` (mantener el JobXML ignorado por Git).
 - [ ] Ejecutar inventario v0.9.0 de 2025.
 - [ ] Ejecutar un nuevo piloto 2025 con `MORPHOLOGY_MAX`.
 - [ ] Revisar `*_image_quality.json` y las imágenes advertidas.

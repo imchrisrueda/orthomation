@@ -48,7 +48,7 @@ Se ajustan `f`, `cx`, `cy`, `k1-k3` y `p1-p2`, con Adaptive Fitting y covarianza
 ## Estado de campañas
 
 - 2025: preparado para repetir el piloto.
-- 2026: bloqueado. El fichero suministrado como 2026 es idéntico al JobXML 2025 y contiene fechas de observación de 2025.
+- 2026: el candidato recibido el 17/09/2026 (SHA-256 `3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5`) pasa el parser al indicarle su ruta explícitamente. La ruta predeterminada aún contiene la copia anterior de 2025 y la campaña permanece bloqueada. Tras el dictamen geomático, copiar el JobXML aceptado a `control/jobxml/2026-GPS-ensayopalmeri-poveda.jxl`; los JobXML están excluidos de Git.
 
 ## Pruebas locales
 

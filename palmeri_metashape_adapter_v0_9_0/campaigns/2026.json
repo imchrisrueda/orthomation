@@ -1,8 +1,8 @@
 {
   "campaign_id": "2026",
   "name": "Poveda-Palmeri 2026 RGB",
-  "status": "AWAITING_VALID_JOBXML",
-  "status_detail": "The supplied 2026 JobXML is byte-identical to the 2025 survey and contains 2025-04-29 observations. Replace it before enabling this campaign.",
+  "status": "BLOCKED_GEOMATIC_REVIEW",
+  "status_detail": "The candidate received at repository root on 2026-09-17 passes parser rules when supplied explicitly (six points, 2026 observations, ETRS89 / UTM 30 North, EGM08IGN; SHA-256 3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5). default_jobxml still resolves to the old 2025 copy under control/jobxml, which fails the campaign-year rule. Keep campaign blocked until independent geomatic review accepts the candidate and the local configured copy is replaced.",
   "sensor": "DJI Zenmuse P1",
   "kind": "RGB",
   "output_crs": "EPSG::25830",

@@ -1,5 +1,11 @@
 # Changelog
 
+## Documentación — 2026-09-17
+
+- Registra la recepción del JobXML 2026, su SHA-256 y resultado PASS de las reglas automáticas del parser.
+- Registra que la campaña sigue apuntando a la copia antigua local; requiere dictamen geomático antes de sustituirla.
+- Corrige la afirmación previa de que el JobXML 2026 era idéntico al de 2025.
+
 ## 0.9.0
 
 - Integra la corrección vertical experimental en el pipeline masivo.
