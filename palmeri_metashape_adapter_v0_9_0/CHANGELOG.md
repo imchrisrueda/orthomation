@@ -1,5 +1,11 @@
 # Changelog
 
+## Documentación — 2026-09-17 (guía del repositorio)
+
+- Añade README raíz con propósito, mapa del repositorio, estado, límites y referencias para empezar.
+- Amplía la guía del adaptador con preparación local, pasos de operación, informes, seguridad, pruebas y límites de la versión activa.
+- Detalla el registro de campañas nuevas y su bloqueo hasta revisión geomática.
+
 ## Documentación — 2026-09-17
 
 - Registra la recepción del JobXML 2026, su SHA-256 y resultado PASS de las reglas automáticas del parser.
