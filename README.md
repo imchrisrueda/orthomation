@@ -4,7 +4,7 @@ Orthomation desarrolla flujos reproducibles para preparar y comparar reconstrucc
 
 ## Estado del proyecto
 
-El adaptador activo es **Palmeri Metashape Adapter v0.9.0**, dirigido a Agisoft Metashape Professional 2.3.x. El flujo experimental actual está preparado para el piloto 2025; todavía no se ha repetido ese procesamiento con v0.9.0 ni se han generado productos finales comparables.
+El adaptador activo es **Palmeri Metashape Adapter v0.9.0**, dirigido al entorno revisado Agisoft Metashape Professional 2.3.1. El piloto 2025-04-29 dispone de MASTER y marcado validados; el dictamen geomático del experimento `fixed_model_v1` autoriza ahora únicamente crear de forma no destructiva dos ramas nuevas y detenerse a revisar su informe. No consta que esa preparación haya terminado y no se han generado productos finales comparables.
 
 La campaña 2026 está bloqueada para revisión geomática. El candidato JobXML recibido pasa las reglas del parser si se proporciona explícitamente, pero la ruta local predeterminada de la campaña conserva la copia antigua de 2025. No ejecutar vuelos 2026 ni copiar datos de control a GitHub.
 
@@ -25,6 +25,8 @@ La campaña 2026 está bloqueada para revisión geomática. El candidato JobXML 
 ## Inicio rápido
 
 Para instalar y operar el adaptador activo, sigue primero su [guía de uso](palmeri_metashape_adapter_v0_9_0/README.md). En resumen, necesitarás Windows, Agisoft Metashape Professional 2.3.x, imágenes originales y los JobXML de control entregados por separado. Los JobXML y otros datos de vuelo se excluyen del repositorio.
+
+La única acción geomática autorizada actualmente es abrir el MASTER 2025-04-29 en Metashape 2.3.1 y ejecutar `scripts/prepare_branches.py`. Después hay que revisar `branch_setup_fixed_model_v1_v0_9_0.json` y detenerse. Preflight, optimización, exportación de métricas, productos y otros vuelos permanecen bloqueados; consulta el [dictamen `fixed_model_v1`](palmeri_metashape_adapter_v0_9_0/FIXED_MODEL_V1_REVIEW.md).
 
 Las pruebas unitarias puras se ejecutan desde la carpeta del adaptador:
 

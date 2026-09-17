@@ -1,0 +1,11 @@
+Agisoft Metashape Professional Version: 2.3.1 build 22580 (64 bit)
+LoadProject: path = F:\datos_palmeri\_geomatics_automation\2025\projects\metashape\2025-04-29\RGB_P1\2025-04-29_RGB_P1_MORPHOLOGY_MAX_MASTER.psx, read_only = on
+FIXED_MODEL_TASK_PARAMETERS {"adaptive_fitting": false, "fit_b1": false, "fit_b2": false, "fit_corrections": false, "fit_cx": true, "fit_cy": true, "fit_f": true, "fit_k1": true, "fit_k2": true, "fit_k3": true, "fit_k4": false, "fit_p1": true, "fit_p2": true, "tiepoint_covariance": true}
+FIXED_MODEL_JOBXML_SHA256 877c73e9a409d41c1262adf6921713d009db4a395d977550755b15d8f2b63d18
+FIXED_MODEL_MASTER_OPEN_MODE read_only=True
+FIXED_MODEL_MASTER_PERSISTED_SHA256 49925af981c6a0076cb5f43490d8b4b344864ebe71a2d0407cb4ec3b2fe24d10
+FIXED_MODEL_MASTER_LIVE_SHA256 e75f994cfff3a0a286ee7e3283b4ae2f202ce7869ee4e42c3b4caf0107831520
+FIXED_MODEL_MASTER_COMMON_12SIG_SHA256 53c4790ff878b4b5cc2e132e87f4df5394beba4093bbf928ddfb8ba25b3cc0d1
+FIXED_MODEL_MASTER_MAX_ABS_DELTA 7.771561172376096e-16
+FIXED_MODEL_SYNTHETIC_LOCAL_RESIDUAL [0.0, 0.0, 0.0]
+METASHAPE_FIXED_MODEL_SMOKE_OK

@@ -1,5 +1,18 @@
 # Changelog
 
+## Experimento `fixed_model_v1` — 2026-09-17
+
+- Cambia únicamente `optimization.adaptive_fitting` a `false`; conserva ambos presets de alineación con `adaptive_fitting=true`.
+- Registra el dictamen final `APPROVED_WITH_CONDITIONS`: contrato y tolerancias `1e-12` aprobados, con autorización operativa limitada a la preparación no destructiva de ramas.
+- Añade la preparación de ramas nuevas con `run_id` desde la huella MASTER autorizada, sin alterar ramas o JSON adaptativos existentes; no consta todavía su ejecución satisfactoria.
+- Endurece el preflight a 43 cámaras, seis proyecciones por marcador, C2/C5 OFF, rotaciones OFF y ausencia de derivados.
+- Hace la optimización fail-closed: sólo guarda `OPTIMIZED_FIXED_MODEL` si el conjunto solicitado y la calibración posterior cumplen el contrato.
+- Añade exportación de residuos, sesgos, RMSE, reproyección, conteos y calibración sin selección automática de rama.
+- Registra un smoke no procesante satisfactorio en Metashape Professional 2.3.1 build 22580, sin aplicar la tarea de optimización.
+- Añade el contrato dual de huella MASTER aprobado: persistida `49925af…`, API live `e75f994c…` y equivalencia común a 12 cifras `53c4790f…`, con límite `1e-15` y comprobación estructural completa.
+- Amplía el smoke para abrir el MASTER con `read_only=True`, verificar las dos representaciones sin guardar el proyecto y registrar `max |delta|=7.771561172376096e-16` frente al límite `1e-15`.
+- Registra 22/22 pruebas unitarias puras correctas y mantiene bloqueados preflight, optimización, exportación, productos y otros vuelos hasta revisar el informe de preparación.
+
 ## Corrección — 2026-09-17 (huella de transformaciones)
 
 - Adapta la huella SHA-256 de transformaciones a Metashape 2.3, cuya matriz puede iterarse como una secuencia plana de números.

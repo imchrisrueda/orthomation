@@ -7,6 +7,7 @@ import json
 import math
 import re
 import xml.etree.ElementTree as ET
+import zipfile
 
 
 class ValidationError(RuntimeError):
@@ -40,6 +41,185 @@ def transform_fingerprint(chunk):
         rows.append((camera.label, values))
     payload = json.dumps(rows, separators=(",", ":"), ensure_ascii=True).encode("ascii")
     return sha256(payload).hexdigest()
+
+
+def camera_transform_rows(chunk):
+    """Return the live camera-transform payload without changing fingerprint semantics."""
+    rows = []
+    for camera in sorted(chunk.cameras, key=lambda item: item.label):
+        transform = camera.transform
+        rows.append((camera.label, [] if transform is None else _flatten_numeric(transform)))
+    return rows
+
+
+def transform_rows_fingerprint(rows):
+    """Hash already-extracted transform rows using the established JSON encoding."""
+    normalized = [(str(label), [float(value) for value in values]) for label, values in rows]
+    payload = json.dumps(normalized, separators=(",", ":"), ensure_ascii=True).encode("ascii")
+    return sha256(payload).hexdigest()
+
+
+def significant_transform_rows(rows, significant_digits):
+    """Return a comparison-only significant-digit representation of transform rows."""
+    digits = int(significant_digits)
+    if digits < 1 or digits > 17:
+        raise ValueError("significant_digits must be between 1 and 17")
+    return [
+        (str(label), [float(format(float(value), f".{digits}g")) for value in values])
+        for label, values in rows
+    ]
+
+
+def persisted_active_chunk_transform_rows(project_path):
+    """Read active-chunk camera transforms directly from a saved PSX without mutation."""
+    psx_path = Path(project_path).resolve()
+    root = ET.parse(psx_path).getroot()
+    relative_archive = root.get("path")
+    if not relative_archive:
+        raise ValidationError(f"PSX does not reference a project archive: {psx_path}")
+    archive_path = psx_path.parent / relative_archive.replace("{projectname}", psx_path.stem)
+    with zipfile.ZipFile(archive_path) as project_archive:
+        project_root = ET.fromstring(project_archive.read("doc.xml"))
+    chunks = project_root.find("chunks")
+    active_id = None if chunks is None else chunks.get("active_id")
+    if chunks is None or active_id is None:
+        raise ValidationError("Saved project does not identify an active chunk")
+    chunk_node = next((node for node in chunks.findall("chunk") if node.get("id") == active_id), None)
+    if chunk_node is None or not chunk_node.get("path"):
+        raise ValidationError(f"Saved active chunk {active_id!r} has no archive path")
+    chunk_archive_path = archive_path.parent / chunk_node.get("path")
+    with zipfile.ZipFile(chunk_archive_path) as chunk_archive:
+        chunk_root = ET.fromstring(chunk_archive.read("doc.xml"))
+    rows = []
+    for camera in chunk_root.findall(".//cameras/camera"):
+        label = camera.get("label")
+        if label is None:
+            raise ValidationError("Saved active chunk contains an unlabeled camera")
+        raw_transform = camera.findtext("transform")
+        values = [] if raw_transform is None else [float(value) for value in raw_transform.split()]
+        rows.append((label, values))
+    return {
+        "chunk_id": active_id,
+        "chunk_label": chunk_root.get("label"),
+        "chunk_archive": str(chunk_archive_path),
+        "rows": sorted(rows),
+    }
+
+
+def transform_representation_equivalence(persisted_rows, live_rows, contract):
+    """Compare persisted and live transforms against the reviewed dual-hash contract."""
+    persisted = [(str(label), [float(value) for value in values]) for label, values in persisted_rows]
+    live = [(str(label), [float(value) for value in values]) for label, values in live_rows]
+    persisted.sort(key=lambda row: row[0])
+    live.sort(key=lambda row: row[0])
+    persisted_by_label = dict(persisted)
+    live_by_label = dict(live)
+    persisted_labels = [label for label, _ in persisted]
+    live_labels = [label for label, _ in live]
+    expected_camera_count = int(contract["expected_camera_count"])
+    expected_component_count = int(contract["expected_transform_component_count"])
+    significant_digits = int(contract["transform_equivalence_significant_digits"])
+    allowed_indices = {int(value) for value in contract["transform_equivalence_allowed_difference_indices"]}
+    maximum_delta = float(contract["source_master_equivalence_max_abs_delta"])
+    issues = []
+
+    persisted_hash = transform_rows_fingerprint(persisted)
+    live_hash = transform_rows_fingerprint(live)
+    if persisted_hash != contract["source_master_transform_sha256"]:
+        issues.append(
+            f"Persisted transform fingerprint={persisted_hash}; "
+            f"expected {contract['source_master_transform_sha256']}"
+        )
+    if live_hash != contract["source_master_live_transform_sha256"]:
+        issues.append(
+            f"Live transform fingerprint={live_hash}; "
+            f"expected {contract['source_master_live_transform_sha256']}"
+        )
+    if len(persisted) != expected_camera_count or len(live) != expected_camera_count:
+        issues.append(
+            f"Transform cameras persisted/live={len(persisted)}/{len(live)}; "
+            f"expected {expected_camera_count}/{expected_camera_count}"
+        )
+    if len(persisted_labels) != len(set(persisted_labels)) or len(live_labels) != len(set(live_labels)):
+        issues.append("Persisted or live transform camera labels are duplicated")
+    if persisted_labels != live_labels:
+        issues.append("Persisted and live transform camera labels differ")
+
+    persisted_components = sum(len(values) for _, values in persisted)
+    live_components = sum(len(values) for _, values in live)
+    if persisted_components != expected_component_count or live_components != expected_component_count:
+        issues.append(
+            f"Transform components persisted/live={persisted_components}/{live_components}; "
+            f"expected {expected_component_count}/{expected_component_count}"
+        )
+
+    different_indices = set()
+    different_values = 0
+    exact_equal_values = 0
+    max_abs_delta = 0.0
+    non_finite = False
+    for label in sorted(set(persisted_by_label) & set(live_by_label)):
+        saved_values = persisted_by_label[label]
+        api_values = live_by_label[label]
+        if len(saved_values) != len(api_values):
+            issues.append(
+                f"{label}: persisted/live transform lengths={len(saved_values)}/{len(api_values)}"
+            )
+            continue
+        for index, (saved, api) in enumerate(zip(saved_values, api_values)):
+            if not math.isfinite(saved) or not math.isfinite(api):
+                non_finite = True
+                continue
+            delta = abs(api - saved)
+            if delta == 0:
+                exact_equal_values += 1
+                continue
+            different_values += 1
+            different_indices.add(index)
+            max_abs_delta = max(max_abs_delta, delta)
+    if non_finite:
+        issues.append("Persisted or live transforms contain non-finite values")
+    unexpected_indices = sorted(different_indices - allowed_indices)
+    if unexpected_indices:
+        issues.append(f"Transform differences outside reviewed rotation indices: {unexpected_indices}")
+    if max_abs_delta > maximum_delta:
+        issues.append(
+            f"Maximum persisted/live transform delta={max_abs_delta!r}; "
+            f"reviewed maximum is {maximum_delta!r}"
+        )
+
+    persisted_common_hash = transform_rows_fingerprint(
+        significant_transform_rows(persisted, significant_digits)
+    )
+    live_common_hash = transform_rows_fingerprint(significant_transform_rows(live, significant_digits))
+    expected_common_hash = contract["source_master_common_12sig_transform_sha256"]
+    if persisted_common_hash != expected_common_hash or live_common_hash != expected_common_hash:
+        issues.append(
+            f"Common {significant_digits}-significant-digit hash persisted/live="
+            f"{persisted_common_hash}/{live_common_hash}; expected {expected_common_hash}"
+        )
+
+    return {
+        "status": "PASS" if not issues else "FAIL",
+        "issues": issues,
+        "persisted_transform_sha256": persisted_hash,
+        "live_transform_sha256": live_hash,
+        "common_significant_digit_transform_sha256": expected_common_hash if not issues else None,
+        "persisted_common_transform_sha256": persisted_common_hash,
+        "live_common_transform_sha256": live_common_hash,
+        "significant_digits": significant_digits,
+        "camera_count_persisted": len(persisted),
+        "camera_count_live": len(live),
+        "component_count_persisted": persisted_components,
+        "component_count_live": live_components,
+        "labels_exactly_equal": persisted_labels == live_labels,
+        "exact_equal_values": exact_equal_values,
+        "different_values": different_values,
+        "different_indices": sorted(different_indices),
+        "allowed_difference_indices": sorted(allowed_indices),
+        "maximum_absolute_delta": max_abs_delta,
+        "maximum_allowed_absolute_delta": maximum_delta,
+    }
 
 
 def sha256_file(path):

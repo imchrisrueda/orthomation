@@ -21,25 +21,28 @@ Fecha de corte: 2026-09-17.
 - [x] Añadir huellas de transformación para detectar cambios antes de optimizar.
 - [x] Añadir pruebas unitarias del parser JobXML, año y XMP.
 - [x] Bloquear campaña 2026 mientras el JobXML está pendiente de verificación.
+- [x] Implementar `fixed_model_v1` con modelo de calibración fijo, `run_id`, preflight y optimización fail-closed.
+- [x] Implementar exportación objetiva y de sólo lectura de métricas posoptimización.
+- [x] Obtener dictamen geomático sobre contrato, tolerancia `1e-12` y equivalencia dual de huella del MASTER.
+- [x] Ejecutar 22 pruebas unitarias y smoke de sólo lectura en Metashape 2.3.1.
 
 ## Siguiente validación inmediata
 
 - [x] Recibir JobXML 2026 distinto del de 2025 y pasar las reglas automáticas del parser (seis puntos; año, CRS y geoide conformes).
 - [ ] Obtener dictamen geomático independiente para el JobXML 2026 y, si se acepta, sustituir la copia antigua local de `control/jobxml/` (mantener el JobXML ignorado por Git).
-- [ ] Ejecutar inventario v0.9.0 de 2025.
-- [ ] Ejecutar un nuevo piloto 2025 con `MORPHOLOGY_MAX`.
-- [ ] Revisar `*_image_quality.json` y las imágenes advertidas.
-- [ ] Marcar E1, E3, E4, E6, C2 y C5 manualmente.
-- [ ] Ejecutar `validate_marking.py`.
-- [ ] Crear y validar ambas ramas.
+- [ ] Ejecutar únicamente `prepare_branches.py` sobre el MASTER 2025-04-29 autorizado.
+- [ ] Verificar la creación no destructiva de `GCP_ONLY_fixed_model_v1` y `GCP_P1_fixed_model_v1`.
+- [ ] Revisar `branch_setup_fixed_model_v1_v0_9_0.json` y someterlo a un nuevo dictamen geomático.
 - [x] Fijar y automatizar el conjunto exacto de parámetros de Optimize Cameras tras comprobar la API 2.3.1.
-- [ ] Ejecutar las dos optimizaciones y extraer métricas GCP/CP.
+- [ ] Mantener bloqueados preflight, optimización, exportación, productos y otros vuelos hasta ese dictamen.
 
 ## Desarrollo Metashape pendiente
 
 - [x] Añadir prueba de integración ejecutada por Metashape 2.3 sobre una imagen P1 real.
 - [x] Añadir `optimize_branch.py` con parámetros bloqueados e informe antes/después.
-- [ ] Añadir extracción objetiva de RMSE, sesgos, reproyección y calibración.
+- [x] Añadir extracción objetiva de RMSE, sesgos, reproyección y calibración.
+- [ ] Ejecutar preflight de ambas ramas sólo tras autorización geomática expresa.
+- [ ] Ejecutar las dos optimizaciones y exportar métricas sólo tras autorización geomática expresa.
 - [ ] Definir el criterio de selección entre `GCP_ONLY` y `GCP_P1`, reconociendo la limitación de dos CP.
 - [ ] Implementar nube, DSM/DTM y ortomosaico solamente después de elegir la solución geométrica.
 - [ ] Implementar conversión vertical final EGM08IGN con validación independiente.

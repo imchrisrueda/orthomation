@@ -76,8 +76,42 @@
     "fit_p1": true,
     "fit_p2": true,
     "fit_corrections": false,
-    "adaptive_fitting": true,
+    "adaptive_fitting": false,
     "tiepoint_covariance": true
+  },
+  "optimization_experiments": {
+    "fixed_model_v1": {
+      "review_status": "APPROVED",
+      "reviewed_metashape_version": "2.3.1",
+      "campaign_id": "2025",
+      "flight_date": "2025-04-29",
+      "source_master_transform_sha256": "49925af981c6a0076cb5f43490d8b4b344864ebe71a2d0407cb4ec3b2fe24d10",
+      "source_master_live_transform_sha256": "e75f994cfff3a0a286ee7e3283b4ae2f202ce7869ee4e42c3b4caf0107831520",
+      "source_master_common_12sig_transform_sha256": "53c4790ff878b4b5cc2e132e87f4df5394beba4093bbf928ddfb8ba25b3cc0d1",
+      "source_master_equivalence_max_abs_delta": 1e-15,
+      "transform_equivalence_significant_digits": 12,
+      "transform_equivalence_allowed_difference_indices": [0, 1, 2, 4, 5, 6, 8, 9, 10],
+      "jobxml_sha256": "877c73e9a409d41c1262adf6921713d009db4a395d977550755b15d8f2b63d18",
+      "expected_camera_count": 43,
+      "expected_transform_component_count": 688,
+      "required_marker_projections": 6,
+      "allowed_calibration_parameters": ["f", "cx", "cy", "k1", "k2", "k3", "p1", "p2"],
+      "fixed_calibration_parameters": ["b1", "b2", "k4"],
+      "nonadjustable_calibration_parameters_audited": ["p3", "p4"],
+      "fixed_parameter_absolute_tolerance": {
+        "b1": 1e-12,
+        "b2": 1e-12,
+        "k4": 1e-12,
+        "p3": 1e-12,
+        "p4": 1e-12
+      },
+      "calibration_change_detection_absolute_tolerance": 1e-12,
+      "tolerance_review_note": "APPROVED_WITH_CONDITIONS: 1e-12 in native Metashape calibration units detects any substantive movement of disabled parameters while allowing double-precision representation noise. Any tolerance change or execution beyond prepare_branches requires a new geomatic review.",
+      "legacy_branch_disposition": {
+        "optimization_status": "REJECTED_ADAPTIVE_FITTING",
+        "selection_status": "NOT_COMPARABLE_FOR_SELECTION"
+      }
+    }
   },
   "processing": {
     "keep_incomplete_on_success": false,

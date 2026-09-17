@@ -125,3 +125,29 @@ La métrica principal de exactitud externa son los CP. Los residuos de GCP descr
 
 - `manuales/metashape-pro_2_3_en.pdf`: alineación, CRS, alturas, GCP/CP, precisiones y optimización.
 - `manuales/pix4D_manual_4_1.pdf`: adquisición, solape y flujo Pix4Dmapper 4.1. La implementación Pix4D queda fuera de v0.9.0.
+
+## 12. Experimento de optimización `fixed_model_v1`
+
+### Hechos confirmados
+
+- El experimento está limitado al piloto 2025-04-29 y a Agisoft Metashape Professional 2.3.1.
+- `config.global.optimization.adaptive_fitting=false`; los presets de alineación `MORPHOLOGY_MAX` y `BASELINE_A0` conservan `adaptive_fitting=true`.
+- El contrato solicita ajustar exactamente `f`, `cx`, `cy`, `k1`, `k2`, `k3`, `p1` y `p2`; mantiene fijos `b1`, `b2` y `k4`; usa `fit_corrections=false` y `tiepoint_covariance=true`.
+- La tolerancia absoluta aprobada por revisión geomática es `1e-12`, en unidades nativas de cada parámetro, para auditar `b1`, `b2`, `k4`, `p3` y `p4`.
+- El MASTER tiene dos representaciones exactas revisadas: huella persistida `49925af981c6a0076cb5f43490d8b4b344864ebe71a2d0407cb4ec3b2fe24d10` y huella API-live `e75f994cfff3a0a286ee7e3283b4ae2f202ce7869ee4e42c3b4caf0107831520`.
+- Metashape 2.3.1 re-ortonormaliza la rotación al cargar. Ambas representaciones coinciden a 12 cifras significativas con huella `53c4790ff878b4b5cc2e132e87f4df5394beba4093bbf928ddfb8ba25b3cc0d1`; la diferencia máxima observada es `7.771561172376096e-16`, inferior al límite revisado `1e-15`. Traslaciones, fila homogénea, etiquetas y estructura permanecen idénticas.
+- Las 22 pruebas unitarias puras y los smoke no procesantes terminaron en PASS. La evidencia del MASTER se obtuvo con `Document.open(..., read_only=True)` y no ejecutó preparación, preflight ni optimización.
+
+### Decisión operativa vigente
+
+- El dictamen `APPROVED_WITH_CONDITIONS` autoriza exclusivamente ejecutar `prepare_branches.py` sobre el MASTER 2025-04-29 y revisar `branch_setup_fixed_model_v1_v0_9_0.json`.
+- Las ramas previas `GCP_ONLY` y `GCP_P1` y sus JSON deben permanecer intactos; se registran externamente como `REJECTED_ADAPTIVE_FITTING` y `NOT_COMPARABLE_FOR_SELECTION`.
+- No hay evidencia de una ejecución satisfactoria de `prepare_branches.py`; las ramas `fixed_model_v1` no se consideran creadas hasta verificar el informe de preparación.
+
+### Limitaciones y bloqueos
+
+- Preflight, optimización, exportación de métricas, selección de rama, productos y otros vuelos requieren un nuevo dictamen geomático.
+- La API 2.3.1 permite observar el conjunto solicitado y la calibración antes/después, pero no expone un conjunto efectivo posterior completo ni un estado documentado de correcciones adicionales. El informe debe declarar esa limitación y no inferir resultados ausentes.
+- Los dos Check Points sólo proporcionan evidencia exploratoria y no justifican por sí solos una caracterización robusta de exactitud externa.
+
+Fuente canónica del dictamen y evidencias: [`palmeri_metashape_adapter_v0_9_0/FIXED_MODEL_V1_REVIEW.md`](palmeri_metashape_adapter_v0_9_0/FIXED_MODEL_V1_REVIEW.md).

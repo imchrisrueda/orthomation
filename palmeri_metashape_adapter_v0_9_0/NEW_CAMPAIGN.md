@@ -9,3 +9,5 @@
 7. Seguir el flujo completo del [README del adaptador](README.md), empezando por el piloto. No procesar vuelos restantes ni campañas completas antes de aceptar el piloto.
 
 No se mantienen CSV manuales paralelos: evita divergencias entre coordenadas, alturas, precisiones y trazabilidad.
+
+La autorización condicionada de `fixed_model_v1` es exclusiva del piloto 2025-04-29 y no se hereda por campañas o vuelos nuevos. Cada ampliación de alcance requiere configuración, huellas y dictamen geomático propios antes de preparar ramas u optimizar.
