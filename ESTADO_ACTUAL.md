@@ -8,6 +8,7 @@ Fecha de corte: 2026-09-18.
 - Las instrucciones de trabajo están en `AGENTS.md`; los perfiles de agentes en `.codex/agents/` y los procedimientos repetibles en `.agents/skills/`.
 - Se actualizó `README.md` para reflejar esta organización y se regeneró/verificó el manifiesto del paquete activo para incluir su `AGENTS.md`.
 - Este corte no cambia configuraciones geomáticas, datos de campaña, resultados ni el alcance de la autorización `fixed_model_v1`.
+- El paquete activo se depuró para una nueva serie de pruebas: conserva código, configuración y pruebas ejecutables; elimina documentación narrativa y logs de smoke de iteraciones anteriores. El README del paquete describe únicamente el estado operativo vigente.
 
 ## Resultado alcanzado
 
