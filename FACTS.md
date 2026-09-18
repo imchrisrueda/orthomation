@@ -1,6 +1,6 @@
 # Facts del proyecto Orthomation
 
-Fecha de corte: 2026-09-17.
+Fecha de corte: 2026-09-18.
 
 Este documento distingue hechos confirmados, decisiones metodológicas adoptadas y cuestiones todavía abiertas. No convierte una hipótesis en hecho.
 

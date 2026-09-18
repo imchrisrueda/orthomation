@@ -11,16 +11,15 @@ La campaña 2026 está bloqueada para revisión geomática. El candidato JobXML 
 ## Paquetes
 
 - [`palmeri_metashape_adapter_v0_9_0/`](palmeri_metashape_adapter_v0_9_0/README.md): adaptador activo, instrucciones de instalación, operación, validación y pruebas.
-- [`palmeri_metashape_automation_v0_8_1/`](palmeri_metashape_automation_v0_8_1/README.md): versión histórica de referencia; no es el flujo activo.
-- [`palmeri_metashape_v8_0_2/`](palmeri_metashape_v8_0_2/README_v8_0_2.md): prototipo histórico de corrección vertical; no es el flujo activo.
 
 ## Documentación del proyecto
 
-- [Estado actual](ESTADO_ACTUAL.md): resultado alcanzado, bloqueos y punto seguro de reanudación.
+- [Estado actual](ESTADO_ACTUAL.md): corte 2026-09-18, resultado alcanzado, bloqueos y punto seguro de reanudación.
 - [Facts](FACTS.md): hechos, decisiones, evidencia y limitaciones metodológicas.
 - [Tareas](TASKS.md): validaciones y desarrollo pendientes.
 - [Manuales locales](manuales/): referencias de Metashape 2.3 y Pix4Dmapper 4.1.
-- [Agentes del proyecto](agents/orchestrator.md): responsabilidades y flujo de revisión documental, técnica y geomática.
+- [`AGENTS.md`](AGENTS.md): contrato vigente de coordinación, límites científicos, delegación y Git para Codex.
+- Los roles ejecutables vigentes están en `.codex/agents/` y los procedimientos repetibles en `.agents/skills/`.
 
 ## Inicio rápido
 

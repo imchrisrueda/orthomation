@@ -1,6 +1,13 @@
 # Tareas del proyecto Orthomation
 
-Fecha de corte: 2026-09-17.
+Fecha de corte: 2026-09-18.
+
+## Actualización documental 2026-09-18
+
+- [x] Consolidar instrucciones de trabajo en `AGENTS.md`, perfiles vigentes en `.codex/agents/` y procedimientos en `.agents/skills/`.
+- [x] Retirar del árbol de trabajo los paquetes históricos v0.8.1 y v8.0.2; su trazabilidad permanece en Git.
+- [x] Actualizar documentación de estado e índice README, y verificar el manifiesto SHA-256 del paquete activo.
+- [ ] Reanudar sólo desde el punto seguro descrito en `ESTADO_ACTUAL.md`; los gates geomáticos y de campaña siguen vigentes.
 
 ## Completado
 

@@ -1,10 +1,17 @@
 # Estado actual de Orthomation
 
-Fecha: 2026-09-17.
+Fecha de corte: 2026-09-18.
+
+## Cambios documentales de este corte
+
+- El árbol mantenido contiene únicamente `palmeri_metashape_adapter_v0_9_0`; las versiones anteriores se conservan en el historial Git.
+- Las instrucciones de trabajo están en `AGENTS.md`; los perfiles de agentes en `.codex/agents/` y los procedimientos repetibles en `.agents/skills/`.
+- Se actualizó `README.md` para reflejar esta organización y se regeneró/verificó el manifiesto del paquete activo para incluir su `AGENTS.md`.
+- Este corte no cambia configuraciones geomáticas, datos de campaña, resultados ni el alcance de la autorización `fixed_model_v1`.
 
 ## Resultado alcanzado
 
-Se ha creado `palmeri_metashape_adapter_v0_9_0` como nueva base, manteniendo intactos `palmeri_metashape_automation_v0_8_1` y `palmeri_metashape_v8_0_2` para trazabilidad.
+`palmeri_metashape_adapter_v0_9_0` es la única base mantenida. Las versiones previas se retiraron del árbol de trabajo tras confirmar que no eran dependencias de ejecución; su trazabilidad permanece en el historial Git.
 
 La v0.9.0 ya no depende de CSV con alturas provisionales. Integra directamente el JobXML, usa altura elipsoidal, aplica precisiones individuales, valida XMP P1 y registra QA de imagen.
 

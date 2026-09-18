@@ -1,4 +1,0 @@
-palmeri_metashape_automation_v0.8.1
-Fix: absolute image paths survive work -> MASTER promotion
-Architecture: multi-campaign / GCP-before-alignment / promote INCOMPLETE to MASTER
-Target: Agisoft Metashape Professional 2.3.x
