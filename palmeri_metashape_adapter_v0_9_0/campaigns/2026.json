@@ -2,7 +2,7 @@
   "campaign_id": "2026",
   "name": "Poveda-Palmeri 2026 RGB",
   "status": "BLOCKED_GEOMATIC_REVIEW",
-  "status_detail": "The candidate received at repository root on 2026-09-17 passes parser rules when supplied explicitly (six points, 2026 observations, ETRS89 / UTM 30 North, EGM08IGN; SHA-256 3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5). default_jobxml still resolves to the old 2025 copy under control/jobxml, which fails the campaign-year rule. Keep campaign blocked until independent geomatic review accepts the candidate and the local configured copy is replaced.",
+  "status_detail": "The candidate received at repository root on 2026-09-17 passes structural parser rules when supplied explicitly (six points, 2026 observations, ETRS89 / UTM 30 North, EGM08IGN; SHA-256 3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5d). Its identity mapping and GCP/CP roles are not accepted. default_jobxml still resolves to the old 2025 copy under control/jobxml, which fails the campaign-year and expected-hash rules. Keep campaign blocked until independent geomatic review accepts the candidate and the local configured copy is replaced.",
   "sensor": "DJI Zenmuse P1",
   "kind": "RGB",
   "output_crs": "EPSG::25830",
@@ -16,7 +16,23 @@
     "expected_geoid": "EGM08IGN",
     "expected_coordinate_tokens": ["UTM", "30 North", "ETRS89"],
     "required_survey_method": "NetworkFix",
-    "require_no_poor_precision_warning": true
+    "require_no_poor_precision_warning": true,
+    "expected_sha256": "3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5d"
+  },
+  "jobxml_semantic_acceptance": {
+    "identity_mapping_accepted": false,
+    "roles_accepted": false,
+    "horizontal_semantics_accepted": false,
+    "precision_units_accepted": true
+  },
+  "crs_acceptance": {
+    "source": "campaign_config",
+    "horizontal_epsg": "EPSG::25830",
+    "horizontal_epsg_accepted": false,
+    "coordinate_units": "metre",
+    "coordinate_units_accepted": false,
+    "coordinate_epoch": null,
+    "coordinate_epoch_accepted": false
   },
   "control_points": {
     "1": {"label": "E1", "role": "GCP"},

@@ -1,6 +1,6 @@
 # Estado actual de Orthomation
 
-Fecha de corte: 2026-09-18.
+Fecha de corte: 2026-09-19.
 
 ## Cambios documentales de este corte
 
@@ -24,11 +24,13 @@ El dictamen geomático vigente es `APPROVED_WITH_CONDITIONS`: autoriza sólo `pr
 
 - Sintaxis Python de todos los scripts: correcta.
 - JSON de configuración: correcto.
-- Pruebas unitarias puras: 22/22 correctas para la implementación actual.
+- Pruebas unitarias puras: 52/52 correctas para la implementación actual.
 - Parser JobXML 2025: seis puntos, `NetworkFix`, EGM08IGN, año y precisiones correctos.
 - XMP reales del piloto: 43/43 válidos, RTK fixed y altura elipsoidal coherente.
 - Diferencia cámara-terreno elipsoidal observada: 14,558-14,960 m.
-- JobXML denominado 2026: rechazado por ser idéntico al de 2025.
+- Auditor JobXML candidato: salida redactada, huella esperada obligatoria, dianas `NetworkFix` adicionales visibles, registros no-control informativos con identificadores redactados, roles con procedencia de configuración, comparación opcional sin umbral ni autoasignación y códigos CLI verificados.
+- Candidato JobXML 2026: reglas estructurales automáticas correctas y estado final `REVIEW_REQUIRED`; la campaña permanece bloqueada.
+- Comparador offline de métricas: validación fail-closed de los informes `GCP_ONLY` y `GCP_P1`, procedencia y contratos equivalentes, recálculo de agregados, huellas de las entradas y deltas objetivos `GCP_P1 - GCP_ONLY`. La salida no selecciona rama, no concede aceptación geomática y no autoriza productos.
 - Prueba directa con Metashape 2.3.1: carga correcta de ubicación, precisión XMP, `AnalyzeImages` y precisión individual de marcador.
 - Contrato `OptimizeCameras` fijo, preflight por `run_id`, optimización fail-closed y exportador de métricas de sólo lectura implementados.
 - Tolerancia absoluta de calibración `1e-12` aprobada para `b1`, `b2`, `k4`, `p3` y `p4`.
@@ -42,17 +44,19 @@ El dictamen geomático vigente es `APPROVED_WITH_CONDITIONS`: autoriza sólo `pr
 - No se ha autorizado ni ejecutado el preflight `fixed_model_v1`.
 - No se han optimizado las ramas `fixed_model_v1`.
 - No se ha ejecutado el exportador de métricas sobre ramas optimizadas.
+- No se ha ejecutado el comparador sobre métricas reales; sólo se ha verificado con entradas sintéticas.
 - No se han generado nube, DSM/DTM u ortomosaico.
 - No se han procesado otros vuelos bajo esta autorización.
 - No se ha implementado el adaptador Pix4D.
 
 ## Bloqueos
 
-- Campaña 2026: el JobXML recibido en la raíz del repo supera la validación automática cuando se pasa explícitamente al parser (seis puntos; Trimble JobXML 5.72; observaciones de 2026; ETRS89 / UTM 30 North; EGM08IGN). La ruta predeterminada configurada, `palmeri_metashape_adapter_v0_9_0/control/jobxml/2026-GPS-ensayopalmeri-poveda.jxl`, todavía contiene el fichero anterior con SHA-256 de 2025, por lo que el flujo de campaña aún no acepta el nuevo fichero. La campaña sigue bloqueada hasta instalar la versión recibida en esa ruta local, obtener dictamen geomático y registrar su aceptación.
-- Precisión horizontal Trimble: la asignación X=Y=Horizontal es provisional hasta confirmar su definición estadística.
+- Campaña 2026: el candidato recibido supera las reglas estructurales automáticas (seis puntos; Trimble JobXML 5.72; observaciones de 2026; ETRS89 / UTM 30 North; EGM08IGN), pero el auditor devuelve `REVIEW_REQUIRED` y `campaign_unlock=false`. La identidad y los roles GCP/CP no están aceptados; EPSG y unidades CRS proceden explícitamente de configuración pero tampoco están aceptados, y la época no está fijada. La proximidad frente a 2025 sugiere una permutación diagnóstica que contradice el mapeo configurado, pero no realiza ni autoriza autoasignación. La copia en `control/jobxml/` sigue siendo la de 2025 y falla año y huella esperada.
+- Precisión Trimble: `Horizontal` y `Vertical` están documentadas en metros y a 1-sigma. Usar `X=Y=Horizontal` sigue siendo una aproximación isotrópica, no evidencia de sigmas independientes por componente.
 - Experimento `fixed_model_v1`: preflight, optimización, exportación, selección de rama, productos y otros vuelos permanecen bloqueados hasta un nuevo dictamen geomático posterior a la revisión del informe de preparación.
+- Comparación de ramas: la herramienta está implementada, pero dos CP sólo proporcionan evidencia exploratoria. La selección final exige métricas reales comparables y una decisión geomática humana documentada.
 
-El JobXML recibido se conserva localmente en la raíz del repo y está excluido de Git por contener datos de control. Su SHA-256 es `3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5`. El fichero que aún está en la ruta configurada y el de 2025 tienen SHA-256 `877c73e9a409d41c1262adf6921713d009db4a395d977550755b15d8f2b63d18`.
+El JobXML recibido se conserva localmente en la raíz del repo y está excluido de Git por contener datos de control. Su SHA-256 es `3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5d`. El fichero que aún está en la ruta configurada y el de 2025 tienen SHA-256 `877c73e9a409d41c1262adf6921713d009db4a395d977550755b15d8f2b63d18`.
 
 ## Punto seguro de reanudación
 

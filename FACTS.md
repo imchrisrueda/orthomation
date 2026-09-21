@@ -1,6 +1,6 @@
 # Facts del proyecto Orthomation
 
-Fecha de corte: 2026-09-18.
+Fecha de corte: 2026-09-19.
 
 Este documento distingue hechos confirmados, decisiones metodológicas adoptadas y cuestiones todavía abiertas. No convierte una hipótesis en hecho.
 
@@ -50,8 +50,8 @@ Este documento distingue hechos confirmados, decisiones metodológicas adoptadas
 
 ## 5. Precisión y ponderación
 
-- Cada marcador recibe precisión individual `X=Y=Horizontal`, `Z=Vertical` desde `PointRecord/Precision`.
-- La interpretación `X=Y=Horizontal` es una decisión operativa pendiente de confirmar con la definición estadística exacta de Trimble; no se presenta como hecho metrológico definitivo.
+- La fuente primaria Trimble [`JobXMLSchema-5.72.xsd`](https://www.trimble.com/schema/JobXML/5_7/JobXMLSchema-5.72.xsd), en el elemento `PointRecord/Precision` de tipo `distType`, define `Horizontal` y `Vertical` en metros y como estimaciones 1-sigma.
+- Cada marcador recibe precisión individual `X=Y=Horizontal`, `Z=Vertical` desde `PointRecord/Precision`. La asignación del único estadístico horizontal a ambos ejes es una aproximación isotrópica de implementación, no un hecho metrológico sobre componentes X/Y independientes.
 - Cada cámara conserva `RtkStdLon`, `RtkStdLat` y `RtkStdHgt` por fotografía. Se rechazan valores ausentes, no positivos, superiores a 0,5 m o estados no fijos.
 - El manual Metashape señala que las precisiones RTK/PPK deben cargarse individualmente; en caso contrario se asume por defecto 10 m. También permite precisiones diferentes por coordenada y por elemento (manual, páginas impresas 101 y 112).
 - Las orientaciones yaw/pitch/roll se cargan para auditoría, pero permanecen desactivadas en ambas ramas. La única variable de `GCP_ONLY` frente a `GCP_P1` es la posición XYZ P1.
@@ -115,10 +115,12 @@ La métrica principal de exactitud externa son los CP. Los residuos de GCP descr
 
 ## 10. Estado 2026
 
-- El JobXML añadido al workspace el 17/09/2026 es distinto del de 2025. SHA-256 2026: `3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5`; SHA-256 2025: `877c73e9a409d41c1262adf6921713d009db4a395d977550755b15d8f2b63d18`.
+- El JobXML añadido al workspace el 17/09/2026 es distinto del de 2025. SHA-256 2026: `3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5d`; SHA-256 2025: `877c73e9a409d41c1262adf6921713d009db4a395d977550755b15d8f2b63d18`.
 - El parser del adaptador v0.9.0 valida el candidato de la raíz del repo cuando se proporciona esa ruta explícitamente: seis puntos, observaciones de 2026, JobXML 5.72, ETRS89 / UTM 30 North y geoide EGM08IGN.
-- La ruta configurada como `default_jobxml` en `campaigns/2026.json` aún apunta a la copia local antigua en `control/jobxml/`; esta tiene la misma huella que el JobXML 2025 y falla la regla de año. El conjunto actual de pruebas confirma que la copia configurada se rechaza para 2026.
-- Hecho confirmado: el candidato recibido pasa validación automática, pero no es todavía el archivo que selecciona por defecto la campaña. Pendiente: revisión geomática independiente, aceptación de coordenadas, identificadores/roles, método GNSS, precisiones y advertencias, y después actualizar la copia local configurada.
+- `campaigns/2026.json` fija la huella esperada completa del candidato. La ruta `default_jobxml` aún apunta a la copia local antigua en `control/jobxml/`; esta tiene la misma huella que el JobXML 2025 y falla las reglas de año y huella.
+- `scripts/validate_jobxml_candidate.py` genera un informe JSON redactado y de sólo lectura: no emite coordenadas, alturas individuales, XML ni rutas absolutas; distingue validación automática de aceptación geomática; detecta dianas `NetworkFix` adicionales; clasifica registros no destinados a control, incluida la base GNSS `FromBase/KeyedIn`, de forma informativa y sin revelar sus identificadores; y nunca reasigna identidades ni desbloquea la campaña.
+- Hecho confirmado: el candidato supera las reglas estructurales automáticas, pero queda `REVIEW_REQUIRED`, con `campaign_unlock=false`, porque no están aceptadas su identidad ni sus funciones GCP/CP. El EPSG y las unidades CRS constan con `source=campaign_config` pero siguen sin aceptación geomática; la época continúa sin fijar.
+- Inferencia diagnóstica, no autoasignación: la proximidad espacial frente a 2025 sugiere `E1→E6`, `C2→E1`, `E3→C2`, `E4→C5`, `C5→E4`, `E6→E3`. Esta permutación contradice el mapeo configurado y debe ser resuelta por revisión geomática independiente; no modifica etiquetas ni roles.
 - El JobXML y los datos de control permanecen excluidos del repositorio remoto. La huella permite verificar localmente qué versión se revisó sin publicar el contenido.
 
 ## 11. Fuentes locales contrastadas
@@ -147,6 +149,24 @@ La métrica principal de exactitud externa son los CP. Los residuos de GCP descr
 ### Limitaciones y bloqueos
 
 - Preflight, optimización, exportación de métricas, selección de rama, productos y otros vuelos requieren un nuevo dictamen geomático.
+
+## 13. Comparación objetiva de ramas
+
+### Hechos confirmados
+
+- `scripts/comparison_core.py` y `scripts/compare_branch_metrics.py` implementan una comparación Python pura, sin importar Metashape ni abrir MASTER o imágenes.
+- El comparador exige exactamente un informe `GCP_ONLY` y uno `GCP_P1`, ambos `METRICS_EXPORTED`, sin incidencias y con la misma procedencia, configuración, huellas del MASTER y contrato de optimización.
+- Revalida roles y activación de E1/E3/E4/E6 como GCP y C2/C5 como CP, las convenciones de coordenadas y altura elipsoidal, los conteos, cámaras, calibración y agregados matemáticamente derivables. Registra la huella SHA-256 de cada informe sin publicar su ruta.
+- La salida aceptada sólo contiene valores lado a lado y deltas `GCP_P1 - GCP_ONLY`; declara `selection_performed=false`, `human_decision_required=true`, `geomatic_acceptance=NOT_GRANTED` y `products_authorized=false`.
+- La implementación y los casos adversariales han superado revisión geomática y QA independientes. La suite pura actual contiene 52 pruebas.
+
+### Limitaciones y riesgos
+
+- La implementación sólo se ha probado con informes sintéticos; todavía no existen dos informes reales autorizados para comparar.
+- Dos Check Points aportan evidencia exploratoria, no una caracterización robusta de exactitud.
+- El comparador no reabre Metashape ni revalida por sí mismo CRS, restricciones GNSS/P1, identidad criptográfica de las imágenes o ausencia actual de productos; esas limitaciones se declaran en su salida.
+- La altura comparada es elipsoidal `h`. No se convierte ni se reinterpreta como altura ortométrica `H`.
+- Ninguna salida del comparador selecciona una rama o autoriza productos. Ambas decisiones siguen siendo gates humanos.
 - La API 2.3.1 permite observar el conjunto solicitado y la calibración antes/después, pero no expone un conjunto efectivo posterior completo ni un estado documentado de correcciones adicionales. El informe debe declarar esa limitación y no inferir resultados ausentes.
 - Los dos Check Points sólo proporcionan evidencia exploratoria y no justifican por sí solos una caracterización robusta de exactitud externa.
 

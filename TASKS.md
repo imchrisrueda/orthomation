@@ -1,6 +1,6 @@
 # Tareas del proyecto Orthomation
 
-Fecha de corte: 2026-09-18.
+Fecha de corte: 2026-09-19.
 
 ## Actualización documental 2026-09-18
 
@@ -32,11 +32,15 @@ Fecha de corte: 2026-09-18.
 - [x] Implementar exportación objetiva y de sólo lectura de métricas posoptimización.
 - [x] Obtener dictamen geomático sobre contrato, tolerancia `1e-12` y equivalencia dual de huella del MASTER.
 - [x] Ejecutar 22 pruebas unitarias y smoke de sólo lectura en Metashape 2.3.1.
+- [x] Implementar auditor redactado y de sólo lectura para candidatos JobXML, con huella esperada, detección de IDs adicionales y comparación diagnóstica sin autoasignación.
+- [x] Confirmar en documentación Trimble que `Precision/Horizontal` y `Vertical` están expresadas en metros y son estimaciones 1-sigma.
+- [x] Implementar y revisar un comparador offline fail-closed para métricas `GCP_ONLY`/`GCP_P1`, sin ranking, selección automática ni autorización de productos.
+- [x] Ejecutar 52 pruebas puras, incluidos casos adversariales de JobXML y comparación de métricas, y verificar el manifiesto del paquete.
 
 ## Siguiente validación inmediata
 
 - [x] Recibir JobXML 2026 distinto del de 2025 y pasar las reglas automáticas del parser (seis puntos; año, CRS y geoide conformes).
-- [ ] Obtener dictamen geomático independiente para el JobXML 2026 y, si se acepta, sustituir la copia antigua local de `control/jobxml/` (mantener el JobXML ignorado por Git).
+- [ ] Resolver mediante dictamen geomático independiente la identidad y los roles del JobXML 2026; la permutación por proximidad es sólo inferencia diagnóstica. Si se acepta, sustituir la copia antigua local de `control/jobxml/` (mantener el JobXML ignorado por Git).
 - [ ] Ejecutar únicamente `prepare_branches.py` sobre el MASTER 2025-04-29 autorizado.
 - [ ] Verificar la creación no destructiva de `GCP_ONLY_fixed_model_v1` y `GCP_P1_fixed_model_v1`.
 - [ ] Revisar `branch_setup_fixed_model_v1_v0_9_0.json` y someterlo a un nuevo dictamen geomático.
@@ -48,9 +52,10 @@ Fecha de corte: 2026-09-18.
 - [x] Añadir prueba de integración ejecutada por Metashape 2.3 sobre una imagen P1 real.
 - [x] Añadir `optimize_branch.py` con parámetros bloqueados e informe antes/después.
 - [x] Añadir extracción objetiva de RMSE, sesgos, reproyección y calibración.
+- [x] Añadir comparación objetiva lado a lado y deltas `GCP_P1 - GCP_ONLY`, con huellas de entrada y evidencia de dos CP declarada exploratoria.
 - [ ] Ejecutar preflight de ambas ramas sólo tras autorización geomática expresa.
 - [ ] Ejecutar las dos optimizaciones y exportar métricas sólo tras autorización geomática expresa.
-- [ ] Definir el criterio de selección entre `GCP_ONLY` y `GCP_P1`, reconociendo la limitación de dos CP.
+- [ ] Definir y documentar la decisión humana de selección entre `GCP_ONLY` y `GCP_P1` cuando existan métricas reales, reconociendo la limitación de dos CP; el comparador no decide ni puntúa.
 - [ ] Implementar nube, DSM/DTM y ortomosaico solamente después de elegir la solución geométrica.
 - [ ] Implementar conversión vertical final EGM08IGN con validación independiente.
 - [ ] Añadir perfiles de producto para clasificación y para reconstrucción 3D.
@@ -67,6 +72,6 @@ Fecha de corte: 2026-09-18.
 
 ## Investigación pendiente
 
-- [ ] Confirmar en documentación Trimble si `Precision/Horizontal` es sigma por componente, precisión radial o estadístico a otro nivel de confianza.
+- [ ] Decidir y documentar si se mantiene la aproximación isotrópica `X=Y=Horizontal` o se adopta otra ponderación; Trimble confirma metros y 1-sigma, pero no componentes X/Y independientes.
 - [ ] Documentar solapes reales de todos los vuelos y contrastarlos con los mínimos recomendados para agricultura.
 - [ ] Definir cómo comunicar incertidumbre con solo dos Check Points.
