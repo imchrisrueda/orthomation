@@ -39,7 +39,7 @@ python palmeri_metashape_adapter_v0_9_0/scripts/validate_configuration.py
 python tools/verify_package.py
 ```
 
-El checker valida sintaxis AST sin importar Metashape, JSON estricto, TOML y perfiles, el subconjunto escalar `name`/`description` de las cuatro skills (no es un validador YAML universal), enlaces Markdown locales y anchors, configuración, integridad y la suite `test_*.py`. Excluye los smoke de Metashape. El mismo comando está configurado en CI para Ubuntu y Windows con Python 3.12; su ejecución remota no está verificada hasta integrar los cambios.
+El checker valida sintaxis AST sin importar Metashape, JSON estricto, TOML y perfiles, el subconjunto escalar `name`/`description` de las cuatro skills (no es un validador YAML universal), enlaces Markdown locales y anchors, configuración, integridad y la suite `test_*.py`. Excluye los smoke de Metashape. El mismo comando está configurado en CI para Windows con Python 3.12, plataforma objetivo confirmada por el usuario; su ejecución remota sigue pendiente hasta publicar y ejecutar.
 
 Resultado local del 02/10/2026: checker PASS, 71 pruebas con una omitida por permisos Windows para symlinks y 41 fuentes verificadas byte a byte. Se probaron tipos JSON estrictos y números no representables sin crash de la CLI. Las dos revisiones independientes fueron estáticas; no se ejecutó Metashape ni se revalidaron datos reales. El descubrimiento de las skills está confirmado, pero la aplicación técnica de perfiles de agentes en el runtime sigue sin verificar.
 

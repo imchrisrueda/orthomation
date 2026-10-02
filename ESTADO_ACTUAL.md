@@ -17,6 +17,7 @@ El flujo implementado es RGB P1. Inventario y preparación MASTER admiten varios
 - Cinco desarrollos implementados y aceptados tras dos revisiones estáticas independientes, QA y controles geomáticos: gates por fase, validación estructural de configuración, integridad byte a byte, HTML objetivo y checker/CI. Sólo preparación conserva autorización histórica; preflight, optimización y métricas permanecen `REVIEW_REQUIRED`.
 - `python tools/check_repository.py`: PASS local, 71 pruebas puras sintéticas con una omitida por permisos de symlink; cinco TOML, cuatro skills, enlaces locales y manifiesto de 41 fuentes correctos. No se han ejecutado Metashape, auditorías de datos reales ni CI remota.
 - Normalizados los finales de línea de fuentes del paquete según `.gitattributes` y regenerado el manifiesto sin cambiar criterios científicos. La configuración exige tipos JSON estrictos y rechaza enteros no representables sin traceback. El hito técnico no concede aprobación humana geomática ni amplía el alcance de procesamiento.
+- Alcance de CI corregido a Windows por indicación del usuario: `windows-latest`, sin matriz Ubuntu. Conserva el checker, los pasos y permisos; la ejecución remota sigue pendiente hasta publicar y ejecutar. Este ajuste documental y de workflow no repite la suite ni modifica gates científicos.
 
 ## Revisión de agentes y skills 2026-10-02
 

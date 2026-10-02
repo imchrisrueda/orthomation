@@ -27,7 +27,8 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no
 - [x] Implementar checker común local/CI y aislar las pruebas del parser con controles sintéticos temporales.
 - [x] Ejecutar checker local: 71 pruebas puras, una omitida por permisos de symlink en Windows, configuración e integridad de 41 fuentes correctas; tipos estrictos y entero extremo cubiertos.
 - [x] Obtener PASS técnico estático de QA y controles geomáticos independientes y aceptar el hito sin ampliar autorizaciones científicas.
-- [ ] Verificar la ejecución de CI Ubuntu/Windows cuando se publique la integración; la integración local está completa, pero no se ha hecho push ni ejecutado CI remota.
+- [x] Ajustar el alcance de CI a Windows, plataforma objetivo confirmada por el usuario; conservar el comando offline y sus permisos.
+- [ ] Verificar la ejecución de CI Windows cuando se publique la integración; la integración local está completa, pero no se ha hecho push ni ejecutado CI remota.
 
 ## Revisión de agentes y skills 2026-10-02
 
