@@ -2,6 +2,7 @@ import json
 import math
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +28,7 @@ from optimization_core import (
     validate_metashape_version,
     validate_optimization_contract,
 )
+from test_validate_jobxml_candidate import jobxml as synthetic_jobxml
 
 
 class FakeCamera:
@@ -44,7 +46,13 @@ class CoreTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.campaign = json.loads((ROOT / "campaigns" / "2025.json").read_text(encoding="utf-8"))
-        cls.jobxml = ROOT / cls.campaign["default_jobxml"]
+        cls.temporary = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(cls.temporary.cleanup)
+        cls.jobxml = Path(cls.temporary.name) / "synthetic_control.xml"
+        cls.jobxml.write_text(synthetic_jobxml([
+            (str(i), 100.0 + i, 200.0 + i, 151.0 + i, 100.0 + i)
+            for i in range(1, 7)
+        ]).replace("2026-05-06", "2025-04-29"), encoding="utf-8")
 
     def test_2025_jobxml_is_valid_and_ellipsoidal(self):
         result = parse_jobxml(
@@ -58,7 +66,7 @@ class CoreTests(unittest.TestCase):
         for point in result["points"].values():
             self.assertEqual(point["survey_method"], "NetworkFix")
             self.assertGreater(point["h_ellipsoid"], point["H_orthometric"])
-            self.assertAlmostEqual(point["geoid_separation"], 51.2116, places=3)
+            self.assertAlmostEqual(point["geoid_separation"], 51.0, places=3)
             self.assertGreater(point["horizontal_precision"], 0)
             self.assertGreater(point["vertical_precision"], 0)
 
@@ -72,7 +80,7 @@ class CoreTests(unittest.TestCase):
         campaign = json.loads((ROOT / "campaigns" / "2026.json").read_text(encoding="utf-8"))
         with self.assertRaisesRegex(ValidationError, "observation years"):
             parse_jobxml(
-                ROOT / campaign["default_jobxml"],
+                self.jobxml,
                 campaign["control_points"],
                 campaign["jobxml_rules"],
             )
@@ -129,7 +137,7 @@ class CoreTests(unittest.TestCase):
         config = json.loads((ROOT / "config" / "global.json").read_text(encoding="utf-8"))
         config["optimization_experiments"]["fixed_model_v1"]["review_status"] = "REVIEW_REQUIRED"
         with self.assertRaisesRegex(RuntimeError, "geomatic review"):
-            require_approved_experiment(config, "fixed_model_v1")
+            require_approved_experiment(config, "fixed_model_v1", "prepare_branches")
 
     def test_reviewed_tolerances_and_metashape_version_are_exact(self):
         config = json.loads((ROOT / "config" / "global.json").read_text(encoding="utf-8"))

@@ -219,14 +219,14 @@ def tie_point_metrics(chunk):
 
 
 def main():
+    config = load_json(ROOT / "config" / "global.json")
+    experiment = optimization_core.require_approved_experiment(config, RUN_ID, "metrics_export")
     doc = Metashape.app.document
     chunk = doc.chunk
     if chunk is None or not doc.path:
         raise RuntimeError("Open and save an OPTIMIZED_FIXED_MODEL branch first")
-    config = load_json(ROOT / "config" / "global.json")
     if config.get("processing", {}).get("overwrite_policy") != "forbid":
         raise RuntimeError("overwrite_policy must remain 'forbid'")
-    experiment = optimization_core.require_approved_experiment(config, RUN_ID)
     optimization_core.validate_metashape_version(Metashape.app.version, experiment["reviewed_metashape_version"])
     branch = meta_value(chunk, "orthomation/branch")
     if branch not in {"GCP_ONLY", "GCP_P1"}:

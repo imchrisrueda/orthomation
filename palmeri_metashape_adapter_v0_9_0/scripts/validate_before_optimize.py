@@ -64,14 +64,14 @@ def derived_products(chunk):
 
 
 def main():
+    global_cfg = load_json(ROOT / "config" / "global.json")
+    experiment = optimization_core.require_approved_experiment(global_cfg, RUN_ID, "preflight")
     doc = Metashape.app.document
     chunk = doc.chunk
     if chunk is None or not doc.path:
         raise RuntimeError("Open and save a run-scoped branch first")
-    global_cfg = load_json(ROOT / "config" / "global.json")
     if global_cfg.get("processing", {}).get("overwrite_policy") != "forbid":
         raise RuntimeError("overwrite_policy must remain 'forbid'")
-    experiment = optimization_core.require_approved_experiment(global_cfg, RUN_ID)
     optimization_core.validate_metashape_version(Metashape.app.version, experiment["reviewed_metashape_version"])
 
     campaign_id = meta_value(chunk, "orthomation/campaign_id")

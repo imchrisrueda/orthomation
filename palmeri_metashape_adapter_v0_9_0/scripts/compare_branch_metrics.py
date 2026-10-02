@@ -17,6 +17,8 @@ from comparison_core import (
 def _parser():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("reports", nargs=2, type=Path)
+    parser.add_argument("--html", type=Path, help="New standalone HTML outside repository (or under ignored tmp/)")
+    parser.add_argument("--demo", action="store_true", help="Label HTML as synthetic demonstration")
     return parser
 
 
@@ -26,6 +28,9 @@ def main(argv=None):
         input_hashes = [sha256_file(path) for path in args.reports]
         reports = [load_metrics_json(path) for path in args.reports]
         result = compare_reports(*reports, input_hashes=input_hashes)
+        if args.html:
+            from comparison_html import write_comparison_html
+            write_comparison_html(result, args.html, args.reports, args.demo)
         exit_code = 0
     except ComparisonError as exc:
         result = failure_report(exc.code)

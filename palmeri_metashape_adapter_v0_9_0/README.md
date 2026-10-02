@@ -4,8 +4,9 @@ Adaptador activo para inventariar vuelos RGB, crear un MASTER y preparar una com
 
 ## Estado operativo
 
+- Los controles offline descritos abajo están implementados y aceptados técnicamente tras revisión QA y de controles geomáticos independientes; no amplían la autorización geomática vigente.
 - Piloto 2025-04-29: la siguiente acción autorizada es preparar, de forma no destructiva, las ramas `GCP_ONLY_fixed_model_v1` y `GCP_P1_fixed_model_v1` desde el MASTER autorizado. Después debe revisarse el informe generado y solicitarse dictamen geomático antes de preflight, optimización, métricas o productos.
-- Campaña 2026: el candidato supera las reglas estructurales, pero queda `REVIEW_REQUIRED` por identidad/roles y metadatos CRS aún no aceptados; la copia local que resuelve `default_jobxml` sigue siendo la antigua.
+- Campaña 2026: la evidencia histórica del 19/09 registra que el candidato supera las reglas estructurales, pero queda `REVIEW_REQUIRED` por identidad/roles y metadatos CRS aún no aceptados; la copia local entonces resuelta por `default_jobxml` era la antigua. Su presencia y huella no se han revalidado hoy.
 - No se generan nube, DSM/DTM ni ortomosaico hasta validar la solución geométrica, comparar ramas y registrar una selección humana.
 
 ## Preparación
@@ -26,6 +27,33 @@ Los lanzadores ejecutan `scripts/palmeri_pipeline.py` dentro de Metashape. Revis
 - El bundle adjustment usa alturas elipsoidales; la conversión EGM08IGN es una etapa posterior explícita y validada.
 - La rama sólo puede optimizarse después de un preflight `PASS` y autorización geomática vigente.
 
+Cada entrada de ramas exige ahora una autorización explícita por fase en `optimization_experiments.fixed_model_v1.phase_authorizations`: `prepare_branches`, `preflight`, `optimization` y `metrics_export`. Sólo preparación conserva `APPROVED`, con referencia al dictamen histórico; las otras fases permanecen `REVIEW_REQUIRED`. La aprobación global no basta; un registro ausente, incompleto o sin evidencia para `APPROVED` bloquea la ejecución. La preparación verifica primero el manifiesto byte a byte y, después de crear ramas, indica detenerse a revisar el informe. Los estados técnicos no conceden permiso humano.
+
+## Controles offline
+
+Desde la raíz del repositorio, con Python 3.12 y sólo biblioteca estándar:
+
+```powershell
+python tools/check_repository.py
+python palmeri_metashape_adapter_v0_9_0/scripts/validate_configuration.py
+python tools/verify_package.py
+```
+
+El checker valida sintaxis AST sin importar Metashape, JSON estricto, TOML y perfiles, el subconjunto escalar `name`/`description` de las cuatro skills (no es un validador YAML universal), enlaces Markdown locales y anchors, configuración, integridad y la suite `test_*.py`. Excluye los smoke de Metashape. El mismo comando está configurado en CI para Ubuntu y Windows con Python 3.12; su ejecución remota no está verificada hasta integrar los cambios.
+
+Resultado local del 02/10/2026: checker PASS, 71 pruebas con una omitida por permisos Windows para symlinks y 41 fuentes verificadas byte a byte. Se probaron tipos JSON estrictos y números no representables sin crash de la CLI. Las dos revisiones independientes fueron estáticas; no se ejecutó Metashape ni se revalidaron datos reales. El descubrimiento de las skills está confirmado, pero la aplicación técnica de perfiles de agentes en el runtime sigue sin verificar.
+
+El validador de configuración no abre imágenes, JobXML ni proyectos. Código `0` significa estructura válida, `1` error y `2` uso CLI incorrecto. Su JSON por stdout distingue estructura de operación: 2026 sigue `REVIEW_REQUIRED` y la plantilla es `DRAFT`/`NOT_EXECUTABLE`; ningún resultado concede aceptación geomática. Las rutas Windows se validan sintácticamente incluso en Linux, sin exigir que existan los discos. `expected_sha256` sigue siendo opcional para el parser de 2025, aunque el auditor de candidatos exige esa huella.
+
+El manifiesto incluye sólo fuentes `.py`, `.json`, `.md`, `.txt` y `.bat`, excluyendo el propio manifiesto, datos de control, temporales, cachés y productos generados. Rechaza entradas duplicadas, traversal, rutas absolutas, links/junctions, fuentes omitidas y diferencias de bytes. `.gitattributes` fija LF para fuentes de texto y CRLF para `.bat`. Tras una edición autorizada del paquete, revisa el diff y regenera explícitamente:
+
+```powershell
+python tools/verify_package.py --write
+python tools/verify_package.py
+```
+
+Regenerar registra los bytes actuales; no demuestra por sí mismo su autenticidad ni autoriza cambios científicos. No normalices JobXML ni informes de métricas para hacer coincidir hashes.
+
 ## Pruebas
 
 Audita un candidato local sin publicar coordenadas, alturas individuales, XML ni rutas absolutas:
@@ -44,10 +72,12 @@ python scripts/compare_branch_metrics.py <metrics_GCP_ONLY.json> <metrics_GCP_P1
 
 El orden de entrada es indiferente. La salida `OBJECTIVE_COMPARISON_READY` sólo confirma que los informes son estructuralmente equivalentes y presenta valores y deltas `GCP_P1 - GCP_ONLY`; no selecciona una rama, no concede aceptación geomática y no autoriza productos. Con sólo C2 y C5, la evidencia sigue siendo exploratoria y requiere decisión humana.
 
+Para obtener HTML independiente, añade `--html <ruta_nueva_fuera_del_repo.html>`; también se permite la carpeta ignorada `tmp/` de la raíz. No se sobrescriben archivos. El HTML usa la misma comparación validada y sus huellas de entrada, muestra valores y deltas sin ranking, escapa texto y no usa JavaScript ni red. Un error no genera HTML. Añade `--demo` únicamente para identificar entradas sintéticas como demostración, sin resultados reales. La salida JSON por stdout y los códigos `0`/`1` del comparador se conservan; argparse usa `2` para errores de uso.
+
 Desde este directorio:
 
 ```powershell
 python -m unittest discover -s tests -v
 ```
 
-`tests/test_orthomation_core.py` y `tests/test_validate_jobxml_candidate.py` contienen pruebas puras. Los smoke de `tests/` requieren Metashape 2.3.1 y las entradas locales autorizadas; sus resultados se generan fuera de Git para cada ejecución.
+La suite pura utiliza fixtures sintéticas, incluidos los controles XML temporales del parser; no necesita JobXML ignorados ni datos de campaña. Los smoke de `tests/` requieren Metashape 2.3.1 y las entradas locales autorizadas; no forman parte del checker offline.

@@ -1,6 +1,39 @@
 # Tareas del proyecto Orthomation
 
-Fecha de corte: 2026-09-19.
+Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no se han repetido ejecuciones Metashape ni auditorías de datos reales.
+
+Ámbito: feature `9c8e3d3` y cambios locales sin commit; `main` permanece en `769f788`.
+
+## Integración y controles pendientes
+
+- [ ] Revisar e integrar en `main` el commit existente de la feature con auditor JobXML, comparador y pruebas; las herramientas ya están implementadas.
+- [ ] Revisar y versionar los cambios locales de agentes, skills y documentación.
+- [x] Aceptar técnicamente tras revisión independiente los gates por fase implementados y probados offline; sólo preparación mantiene autorización histórica, las otras fases siguen bloqueadas.
+- [ ] Definir mediante revisión humana criterios por etapa para selección geométrica y evaluación posterior de productos, resolviendo la cuestión abierta de FACTS §9 sin saltar gates.
+- [ ] Definir y revisar contratos de optimización por vuelo antes de generalizar las huellas y conteos fijos del piloto.
+- [ ] Diseñar e implementar flujos multiespectrales y térmicos según sensores y requisitos aprobados; el pipeline vigente sólo procesa RGB P1.
+
+## Secuencia prevista y dependencias
+
+1. Revisar e integrar cambios existentes y especificar controles pendientes.
+2. Reanudar sólo la preparación autorizada, revisar su informe y obtener decisiones humanas antes de cada fase posterior.
+3. Tras autorización, ejecutar preflight, optimizaciones y exportación; comprobar el comparador con métricas reales y documentar la selección humana.
+4. Tras selección y especificación aprobadas, implementar y validar productos y conversión vertical; ampliar vuelos y sensores con sus contratos y abordar Pix4D después. La campaña 2026 conserva su bloqueo independiente.
+
+## Desarrollos offline 2026-10-02 (hito técnico aceptado)
+
+- [x] Implementar gates por fase y verificación de integridad previa a preparación, conservando los contratos científicos.
+- [x] Implementar validación offline de configuración, manifiesto byte a byte con regeneración explícita y HTML de comparación validada sin ranking.
+- [x] Implementar checker común local/CI y aislar las pruebas del parser con controles sintéticos temporales.
+- [x] Ejecutar checker local: 71 pruebas puras, una omitida por permisos de symlink en Windows, configuración e integridad de 41 fuentes correctas; tipos estrictos y entero extremo cubiertos.
+- [x] Obtener PASS técnico estático de QA y controles geomáticos independientes y aceptar el hito sin ampliar autorizaciones científicas.
+- [ ] Verificar la ejecución de CI Ubuntu/Windows después de integrar los cambios; no se ha publicado ni ejecutado remotamente ahora.
+
+## Revisión de agentes y skills 2026-10-02
+
+- [x] Corregir metadatos YAML de las cuatro skills y precisar rutas, CLI JobXML, gates humanos, sólo lectura de `verifier` y fallback de delegación.
+- [x] Validar cinco TOML, los cuatro frontmatter mediante comprobación básica y `git diff --check`; obtener revisión independiente `verifier: PASS`.
+- El descubrimiento de las cuatro skills está confirmado en el catálogo de la sesión. Limitaciones: `quick_validate.py` no pudo ejecutarse por ausencia de PyYAML y la aplicación técnica de perfiles de agentes en el runtime no está verificada. Los gates científicos conservan su alcance.
 
 ## Actualización documental 2026-09-18
 
@@ -9,7 +42,7 @@ Fecha de corte: 2026-09-19.
 - [x] Actualizar documentación de estado e índice README, y verificar el manifiesto SHA-256 del paquete activo.
 - [ ] Reanudar sólo desde el punto seguro descrito en `ESTADO_ACTUAL.md`; los gates geomáticos y de campaña siguen vigentes.
 
-## Completado
+## Completado (evidencia histórica)
 
 - [x] Revisar las conversaciones previas, manual Metashape 2.3 y manual Pix4Dmapper 4.1.
 - [x] Identificar la mezcla entre altura ortométrica y elipsoidal del paquete antiguo.
@@ -55,6 +88,7 @@ Fecha de corte: 2026-09-19.
 - [x] Añadir comparación objetiva lado a lado y deltas `GCP_P1 - GCP_ONLY`, con huellas de entrada y evidencia de dos CP declarada exploratoria.
 - [ ] Ejecutar preflight de ambas ramas sólo tras autorización geomática expresa.
 - [ ] Ejecutar las dos optimizaciones y exportar métricas sólo tras autorización geomática expresa.
+- [ ] Ejecutar y verificar el comparador existente con dos informes reales autorizados y comparables; hasta ahora sólo se probó con entradas sintéticas.
 - [ ] Definir y documentar la decisión humana de selección entre `GCP_ONLY` y `GCP_P1` cuando existan métricas reales, reconociendo la limitación de dos CP; el comparador no decide ni puntúa.
 - [ ] Implementar nube, DSM/DTM y ortomosaico solamente después de elegir la solución geométrica.
 - [ ] Implementar conversión vertical final EGM08IGN con validación independiente.

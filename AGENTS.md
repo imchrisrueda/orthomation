@@ -28,9 +28,11 @@ El agente principal actúa como orquestador; no existe un subagente `orchestrato
 - `knowledge_researcher`: evidencia primaria, manuales y API; no modifica archivos ni toma decisiones científicas.
 - `geomatics_reviewer`: dictamen independiente sobre validez geomática; puede bloquear cambios, no escribe código.
 - `code_worker`: único implementador de código/configuración técnica bajo una especificación aprobada.
-- `verifier`: QA independiente posterior; no corrige hallazgos salvo instrucción expresa.
+- `verifier`: QA independiente posterior en sólo lectura; devuelve hallazgos al `code_worker` y le solicita ejecutar las pruebas que requieran escritura.
 
 Cada delegación indica objetivo, alcance/archivos autorizados, entradas, criterios de aceptación, pruebas, riesgo geomático y gate humano requerido.
+
+Los perfiles están en `.codex/agents/*.toml`. Si la herramienta de delegación ofrece selección de rol o `agent_type`, selecciona el perfil correspondiente. Si no la ofrece, lee el perfil y transmite sus instrucciones y límites en el encargo; declara que un límite comunicado por prompt no equivale a un sandbox técnico aplicado. Si no hay delegación disponible, el principal ejecuta las fases con esos límites, asume la única implementación y declara la ausencia de revisión independiente. Los dictámenes automatizados nunca sustituyen los gates humanos.
 
 ## Git y datos
 

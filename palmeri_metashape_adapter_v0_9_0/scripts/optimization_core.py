@@ -34,7 +34,29 @@ TRANSFORM_EQUIVALENCE_CONTRACT = {
 }
 
 
-def require_approved_experiment(global_config, run_id):
+EXECUTION_PHASES = ("prepare_branches", "preflight", "optimization", "metrics_export")
+AUTHORIZATION_STATES = {"APPROVED", "REVIEW_REQUIRED", "BLOCKED", "REJECTED"}
+
+
+def validate_phase_authorizations(experiment):
+    records = experiment.get("phase_authorizations")
+    if type(records) is not dict or set(records) != set(EXECUTION_PHASES):
+        raise RuntimeError("Complete phase authorizations are required")
+    for phase, record in records.items():
+        if type(record) is not dict or set(record) != {"status", "evidence"}:
+            raise RuntimeError(f"Malformed phase authorization: {phase}")
+        if type(record["status"]) is not str or record["status"] not in AUTHORIZATION_STATES:
+            raise RuntimeError(f"Unknown phase authorization status: {phase}")
+        if type(record["evidence"]) is not str:
+            raise RuntimeError(f"Malformed phase evidence: {phase}")
+        if record["status"] == "APPROVED" and not record["evidence"].strip():
+            raise RuntimeError(f"Approved phase requires evidence: {phase}")
+    return records
+
+
+def require_approved_experiment(global_config, run_id, phase=None):
+    if phase not in EXECUTION_PHASES:
+        raise RuntimeError("Explicit known execution phase is required")
     experiments = global_config.get("optimization_experiments", {})
     if run_id not in experiments:
         raise RuntimeError(f"Unknown optimization run_id: {run_id!r}")
@@ -46,6 +68,9 @@ def require_approved_experiment(global_config, run_id):
             "geomatic review must set review_status=APPROVED before execution"
         )
     validate_optimization_contract(global_config.get("optimization", {}))
+    records = validate_phase_authorizations(experiment)
+    if records[phase]["status"] != "APPROVED":
+        raise RuntimeError(f"Phase {phase} requires recorded human geomatic approval")
     return experiment
 
 

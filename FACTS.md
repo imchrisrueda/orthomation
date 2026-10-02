@@ -1,11 +1,12 @@
 # Facts del proyecto Orthomation
 
-Fecha de corte: 2026-09-19.
+Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no se han repetido ejecuciones Metashape ni auditorías de datos reales. Las pruebas offline nuevas usan entradas sintéticas.
 
 Este documento distingue hechos confirmados, decisiones metodológicas adoptadas y cuestiones todavía abiertas. No convierte una hipótesis en hecho.
 
 ## 1. Propósito y alcance
 
+- El alcance incluye RGB, multiespectral y térmico; el pipeline activo sólo implementa RGB P1. Los demás sensores requieren desarrollo y validación específicos (evidencia en §14).
 - El objetivo es producir ortomosaicos y reconstrucciones geométricas RGB comparables, con máxima conservación posible de formas y dimensiones, que sirvan después como entrada para clasificación automática o modelado 3D.
 - Habrá dos adaptadores independientes: Agisoft Metashape y Pix4Dmapper. Deben poder utilizarse indistintamente sobre una definición común de campaña, pero no compartirán llamadas internas ni proyectos.
 - La primera implementación y validación se realiza en Agisoft Metashape Professional 2.3.x. Pix4Dmapper 4.1 se abordará después.
@@ -113,7 +114,11 @@ Para seleccionar la mejor solución morfológica se necesitan, como mínimo:
 
 La métrica principal de exactitud externa son los CP. Los residuos de GCP describen ajuste interno y no deben presentarse como validación independiente.
 
+Cuestión abierta: la lista incluye métricas de productos para seleccionar, mientras `AGENTS.md` exige seleccionar la solución geométrica antes de generar productos. Deben definirse mediante revisión humana criterios por etapa; se conserva la lista y no se autoriza generar productos para resolver esta contradicción.
+
 ## 10. Estado 2026
+
+La evidencia de esta sección corresponde al 19/09/2026. No se han revalidado hoy presencia, contenido ni huellas de los JobXML locales ignorados; las afirmaciones sobre la copia antigua describen ese corte histórico.
 
 - El JobXML añadido al workspace el 17/09/2026 es distinto del de 2025. SHA-256 2026: `3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5d`; SHA-256 2025: `877c73e9a409d41c1262adf6921713d009db4a395d977550755b15d8f2b63d18`.
 - El parser del adaptador v0.9.0 valida el candidato de la raíz del repo cuando se proporciona esa ruta explícitamente: seis puntos, observaciones de 2026, JobXML 5.72, ETRS89 / UTM 30 North y geoide EGM08IGN.
@@ -149,6 +154,18 @@ La métrica principal de exactitud externa son los CP. Los residuos de GCP descr
 ### Limitaciones y bloqueos
 
 - Preflight, optimización, exportación de métricas, selección de rama, productos y otros vuelos requieren un nuevo dictamen geomático.
+- La API 2.3.1 permite observar el conjunto solicitado y la calibración antes/después, pero no expone un conjunto efectivo posterior completo ni un estado documentado de correcciones adicionales. El informe debe declarar esa limitación y no inferir resultados ausentes.
+- Los dos Check Points sólo proporcionan evidencia exploratoria y no justifican por sí solos una caracterización robusta de exactitud externa.
+
+### Fuente histórica del dictamen
+
+El dictamen fue retirado del árbol en `769f788`; su fuente primaria conservada se consulta desde la raíz sin restaurar archivos:
+
+```powershell
+git show 4a5d732:palmeri_metashape_adapter_v0_9_0/FIXED_MODEL_V1_REVIEW.md
+```
+
+Autoriza exclusivamente preparar ramas y detenerse a revisar su informe; no autoriza preflight ni fases posteriores.
 
 ## 13. Comparación objetiva de ramas
 
@@ -158,7 +175,7 @@ La métrica principal de exactitud externa son los CP. Los residuos de GCP descr
 - El comparador exige exactamente un informe `GCP_ONLY` y uno `GCP_P1`, ambos `METRICS_EXPORTED`, sin incidencias y con la misma procedencia, configuración, huellas del MASTER y contrato de optimización.
 - Revalida roles y activación de E1/E3/E4/E6 como GCP y C2/C5 como CP, las convenciones de coordenadas y altura elipsoidal, los conteos, cámaras, calibración y agregados matemáticamente derivables. Registra la huella SHA-256 de cada informe sin publicar su ruta.
 - La salida aceptada sólo contiene valores lado a lado y deltas `GCP_P1 - GCP_ONLY`; declara `selection_performed=false`, `human_decision_required=true`, `geomatic_acceptance=NOT_GRANTED` y `products_authorized=false`.
-- La implementación y los casos adversariales han superado revisión geomática y QA independientes. La suite pura actual contiene 52 pruebas.
+- La implementación y los casos adversariales superaron revisión geomática y QA independientes según el registro del 19/09, que contenía 52 pruebas frente a las 22 de la base histórica de `main`. La suite ampliada sí se ejecutó hoy con fixtures sintéticas (§14); no se reconstruyeron ni ejecutaron ramas científicas históricas.
 
 ### Limitaciones y riesgos
 
@@ -167,7 +184,16 @@ La métrica principal de exactitud externa son los CP. Los residuos de GCP descr
 - El comparador no reabre Metashape ni revalida por sí mismo CRS, restricciones GNSS/P1, identidad criptográfica de las imágenes o ausencia actual de productos; esas limitaciones se declaran en su salida.
 - La altura comparada es elipsoidal `h`. No se convierte ni se reinterpreta como altura ortométrica `H`.
 - Ninguna salida del comparador selecciona una rama o autoriza productos. Ambas decisiones siguen siendo gates humanos.
-- La API 2.3.1 permite observar el conjunto solicitado y la calibración antes/después, pero no expone un conjunto efectivo posterior completo ni un estado documentado de correcciones adicionales. El informe debe declarar esa limitación y no inferir resultados ausentes.
-- Los dos Check Points sólo proporcionan evidencia exploratoria y no justifican por sí solos una caracterización robusta de exactitud externa.
 
-Fuente canónica del dictamen y evidencias: [`palmeri_metashape_adapter_v0_9_0/FIXED_MODEL_V1_REVIEW.md`](palmeri_metashape_adapter_v0_9_0/FIXED_MODEL_V1_REVIEW.md).
+## 14. Revisión del repositorio 2026-10-02
+
+- Rama revisada: `feature/validacion-jobxml-y-comparativa-ramas`, HEAD `9c8e3d3`; `main` está en `769f788`. `git rev-list --left-right --count main...HEAD` devuelve `0 1`: la feature añade auditor JobXML, comparador y pruebas. Hay cambios locales de instrucciones y documentación sin commit; no se han integrado ni publicado en esta revisión.
+- Durante la auditoría inicial, `require_approved_experiment` sólo validaba el estado global y el contrato, sin autorización por fase. La implementación posterior mantiene `config/global.json` y sus contratos científicos, añade registros `phase_authorizations` completos y exige una fase explícita antes de acceder al proyecto: preparación con referencia al dictamen histórico, otras tres fases `REVIEW_REQUIRED`. `BRANCHES_READY_FOR_PREFLIGHT` sigue siendo un estado técnico, sin permiso humano para continuar; el mensaje de preparación indica detenerse.
+- `TRANSFORM_EQUIVALENCE_CONTRACT` en `scripts/optimization_core.py` fija las huellas del MASTER piloto, 43 cámaras y 688 componentes. Inventario y preparación MASTER multivuelo no generalizan esa optimización; se requiere un nuevo contrato revisado por vuelo.
+- `scripts/palmeri_pipeline.py` usa `validate_p1_xmp` y rutas `RGB_P1`. No están implementados flujos multiespectrales/térmicos, generación de nube/DSM/DTM/ortomosaico, conversión vertical final ni adaptador Pix4D.
+- El catálogo de esta sesión incluye las cuatro skills del proyecto: descubrimiento confirmado. La revisión de agentes/skills validó cinco TOML y cuatro frontmatter mediante comprobación básica, con revisión independiente PASS. `quick_validate.py` no pudo ejecutarse por ausencia de PyYAML; la aplicación técnica de perfiles de agentes en el runtime sigue sin verificar.
+- `scripts/package_integrity.py` y `tools/verify_package.py` verifican los bytes y el conjunto exacto de fuentes antes de preparar ramas; `.gitattributes` fija finales de línea reproducibles. `--write` sólo regenera explícitamente y no demuestra autenticidad ni aprobación. El validador `scripts/validate_configuration.py` separa estructura de operación, no abre datos y conserva el bloqueo de 2026 y la plantilla DRAFT.
+- `scripts/comparison_html.py` renderiza exclusivamente la salida validada de `compare_reports`, con huellas, límites, texto escapado, sin ranking ni recursos externos; `--html` no sobrescribe archivos y `--demo` identifica entradas sintéticas. `tools/check_repository.py` ejecuta controles y pruebas puras sin importar Metashape; el workflow de CI usa el mismo comando en Ubuntu/Windows.
+- Verificación local del lote: checker PASS, 71 pruebas sintéticas con una omitida por permisos Windows para symlinks, manifiesto de 41 fuentes correcto. El antiguo grupo del parser que dependía de JobXML ignorados ahora usa XML temporal sintético; este PASS no revalida datos científicos históricos. QA y controles geomáticos independientes emitieron PASS técnico estático y el principal aceptó el hito; continúa pendiente la ejecución remota de CI.
+- `configuration_core.validate_global` exige booleanos JSON exactos, enteros exactos para conteos/índices y tolerancias numéricas finitas; rechaza coerciones de strings/bools y el caso `10**400` sin traceback de la CLI. Las pruebas adversariales cubren esos fallos. La aceptación técnica conserva los contratos y no sustituye una decisión humana geomática.
+- Limitaciones: no se han ejecutado smoke Metashape ni auditorías de datos locales. Los contratos por vuelo y los criterios de selección/evaluación de §9 siguen pendientes; la autorización histórica de §12 conserva su alcance.

@@ -1,8 +1,27 @@
 # Estado actual de Orthomation
 
-Fecha de corte: 2026-09-19.
+Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19.
 
-## Cambios documentales de este corte
+## Ámbito del repositorio revisado
+
+La revisión corresponde a `feature/validacion-jobxml-y-comparativa-ramas` (`9c8e3d3`) y cambios locales sin commit; `main` está en `769f788`. La feature añade auditor JobXML, comparador y pruebas, aún sin integrar en `main`.
+
+El flujo implementado es RGB P1. Inventario y preparación MASTER admiten varios vuelos, pero la optimización conserva un contrato específico del piloto. Multiespectral, térmico, productos, conversión vertical y Pix4D requieren desarrollo. Las ejecuciones Metashape y auditorías de datos reales siguientes son históricas y no se han repetido hoy; véase [evidencia del código y límites](FACTS.md#14-revisión-del-repositorio-2026-10-02).
+
+## Controles offline 2026-10-02 (hito técnico aceptado)
+
+- Cinco desarrollos implementados y aceptados tras dos revisiones estáticas independientes, QA y controles geomáticos: gates por fase, validación estructural de configuración, integridad byte a byte, HTML objetivo y checker/CI. Sólo preparación conserva autorización histórica; preflight, optimización y métricas permanecen `REVIEW_REQUIRED`.
+- `python tools/check_repository.py`: PASS local, 71 pruebas puras sintéticas con una omitida por permisos de symlink; cinco TOML, cuatro skills, enlaces locales y manifiesto de 41 fuentes correctos. No se han ejecutado Metashape, auditorías de datos reales ni CI remota.
+- Normalizados los finales de línea de fuentes del paquete según `.gitattributes` y regenerado el manifiesto sin cambiar criterios científicos. La configuración exige tipos JSON estrictos y rechaza enteros no representables sin traceback. El hito técnico no concede aprobación humana geomática ni amplía el alcance de procesamiento.
+
+## Revisión de agentes y skills 2026-10-02
+
+- Hito técnico aceptado tras revisión independiente `verifier: PASS`: las cuatro skills de `.agents/skills/` incorporan metadatos YAML `name` y `description`, rutas desde la raíz y la CLI real del auditor `palmeri_metashape_adapter_v0_9_0/scripts/validate_jobxml_candidate.py`.
+- `AGENTS.md` y `.codex/agents/{geomatics_reviewer,verifier}.toml` separan el dictamen automatizado de los gates humanos, mantienen `verifier` en sólo lectura y documentan el fallback cuando el runtime no permite seleccionar perfiles o delegar.
+- Validación de esta revisión: cinco TOML analizados con `tomllib`, cuatro frontmatter comprobados mediante validación básica de sus campos escalares y `git diff --check` correcto. Fuentes de formato: documentación oficial enlazada en `README.md`, sección «Documentación del proyecto».
+- El catálogo de esta sesión confirma el descubrimiento de las cuatro skills. Limitaciones: `quick_validate.py` no pudo ejecutarse por ausencia de PyYAML; la aplicación técnica de perfiles de agentes en el runtime no está verificada. Esta revisión no modifica el estado científico ni sus autorizaciones.
+
+## Cambios documentales del corte 2026-09-19
 
 - El árbol mantenido contiene únicamente `palmeri_metashape_adapter_v0_9_0`; las versiones anteriores se conservan en el historial Git.
 - Las instrucciones de trabajo están en `AGENTS.md`; los perfiles de agentes en `.codex/agents/` y los procedimientos repetibles en `.agents/skills/`.
@@ -20,11 +39,11 @@ Para el piloto 2025-04-29 se implementó el experimento no destructivo `fixed_mo
 
 El dictamen geomático vigente es `APPROVED_WITH_CONDITIONS`: autoriza sólo `prepare_branches.py` sobre el MASTER 2025-04-29 y obliga a detenerse tras generar y revisar `branch_setup_fixed_model_v1_v0_9_0.json`. No existe evidencia de que esa ejecución haya finalizado.
 
-## Verificaciones ejecutadas
+## Verificaciones históricas registradas hasta 2026-09-19
 
 - Sintaxis Python de todos los scripts: correcta.
 - JSON de configuración: correcto.
-- Pruebas unitarias puras: 52/52 correctas para la implementación actual.
+- Conteos históricos de pruebas puras: 22/22 en la base de `main`; 52/52 en la feature con auditor y comparador. La suite ampliada sí se ejecutó hoy con fixtures sintéticas, como consta arriba; no se reconstruyeron ni ejecutaron las ramas científicas históricas.
 - Parser JobXML 2025: seis puntos, `NetworkFix`, EGM08IGN, año y precisiones correctos.
 - XMP reales del piloto: 43/43 válidos, RTK fixed y altura elipsoidal coherente.
 - Diferencia cámara-terreno elipsoidal observada: 14,558-14,960 m.
@@ -56,7 +75,11 @@ El dictamen geomático vigente es `APPROVED_WITH_CONDITIONS`: autoriza sólo `pr
 - Experimento `fixed_model_v1`: preflight, optimización, exportación, selección de rama, productos y otros vuelos permanecen bloqueados hasta un nuevo dictamen geomático posterior a la revisión del informe de preparación.
 - Comparación de ramas: la herramienta está implementada, pero dos CP sólo proporcionan evidencia exploratoria. La selección final exige métricas reales comparables y una decisión geomática humana documentada.
 
-El JobXML recibido se conserva localmente en la raíz del repo y está excluido de Git por contener datos de control. Su SHA-256 es `3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5d`. El fichero que aún está en la ruta configurada y el de 2025 tienen SHA-256 `877c73e9a409d41c1262adf6921713d009db4a395d977550755b15d8f2b63d18`.
+La evidencia histórica registró el candidato en la raíz del repo, excluido de Git, con SHA-256 `3b8a66c5475505b90c7be77dfb9a42537971af963f0e01d55c307fa64aa7cd5d`. La copia entonces localizada en la ruta configurada y el fichero de 2025 tenían SHA-256 `877c73e9a409d41c1262adf6921713d009db4a395d977550755b15d8f2b63d18`. No se han revalidado hoy presencia, contenido ni huellas de esos datos locales; las referencias a la copia antigua en los bloqueos describen ese corte histórico.
+
+## Control de autorizaciones y deuda restante
+
+La configuración global `review_status=APPROVED` y los estados técnicos de preparación no conceden autorización por fase. Los nuevos gates explícitos están implementados y revisados técnicamente: sólo `prepare_branches` está aprobado con evidencia histórica; las otras tres fases bloquean antes de acceder al proyecto. Quedan pendientes nuevos contratos por vuelo y criterios de selección frente a evaluación posterior de productos ([FACTS §14](FACTS.md#14-revisión-del-repositorio-2026-10-02)). Los bloqueos científicos y el punto seguro siguiente conservan su alcance.
 
 ## Punto seguro de reanudación
 

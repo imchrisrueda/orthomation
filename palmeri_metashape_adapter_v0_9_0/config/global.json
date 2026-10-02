@@ -82,6 +82,15 @@
   "optimization_experiments": {
     "fixed_model_v1": {
       "review_status": "APPROVED",
+      "phase_authorizations": {
+        "prepare_branches": {
+          "status": "APPROVED",
+          "evidence": "git:4a5d732:palmeri_metashape_adapter_v0_9_0/FIXED_MODEL_V1_REVIEW.md; prepare only, stop and review report"
+        },
+        "preflight": {"status": "REVIEW_REQUIRED", "evidence": ""},
+        "optimization": {"status": "REVIEW_REQUIRED", "evidence": ""},
+        "metrics_export": {"status": "REVIEW_REQUIRED", "evidence": ""}
+      },
       "reviewed_metashape_version": "2.3.1",
       "campaign_id": "2025",
       "flight_date": "2025-04-29",

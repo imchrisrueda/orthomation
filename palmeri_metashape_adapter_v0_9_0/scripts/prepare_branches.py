@@ -204,15 +204,17 @@ def legacy_artifacts(doc, project_dir, master_label, experiment):
 
 
 def main():
+    from package_integrity import verify_package
+    verify_package(ROOT)
+    global_cfg = load_json(ROOT / "config" / "global.json")
+    experiment = optimization_core.require_approved_experiment(global_cfg, RUN_ID, "prepare_branches")
     doc = Metashape.app.document
     master = doc.chunk
     if master is None or not doc.path:
         raise RuntimeError("Open and save the authorized MASTER first")
 
-    global_cfg = load_json(ROOT / "config" / "global.json")
     if global_cfg.get("processing", {}).get("overwrite_policy") != "forbid":
         raise RuntimeError("overwrite_policy must remain 'forbid'")
-    experiment = optimization_core.require_approved_experiment(global_cfg, RUN_ID)
     optimization_core.validate_metashape_version(Metashape.app.version, experiment["reviewed_metashape_version"])
     campaign_id = meta_value(master, "orthomation/campaign_id")
     campaign = load_json(ROOT / "campaigns" / f"{campaign_id}.json")
@@ -279,7 +281,7 @@ def main():
     print(json.dumps(report, indent=2, ensure_ascii=False))
     Metashape.app.messageBox(
         f"Run {RUN_ID}: new branches created without modifying legacy branches. "
-        "Run validate_before_optimize.py on each new branch."
+        "STOP. Review the preparation report. Preflight requires a separate recorded human authorization."
     )
 
 

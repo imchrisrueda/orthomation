@@ -1,4 +1,11 @@
+---
+name: release-package
+description: Preparar una versión del adaptador Orthomation con pruebas, documentación y exclusiones revisadas, sin publicarla automáticamente.
+---
+
 # Release package
+
+Resuelve las rutas del paquete activo desde la raíz del repositorio, incluso si la sesión se inició en una subcarpeta.
 
 Usar para preparar una versión, no para publicarla automáticamente.
 

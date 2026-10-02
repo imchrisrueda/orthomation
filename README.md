@@ -1,31 +1,41 @@
 # Orthomation
 
-Orthomation desarrolla flujos reproducibles para preparar y comparar reconstrucciones RGB de vuelos con drones. El objetivo es conservar la geometría y las dimensiones de los objetos y documentar las decisiones, evidencias y límites de cada resultado.
+Orthomation desarrolla flujos reproducibles para preparar y comparar reconstrucciones de vuelos con drones. La implementación activa trabaja con RGB DJI P1 en Metashape; multiespectral, térmico y Pix4D son alcance futuro. El objetivo es conservar la geometría y las dimensiones de los objetos y documentar las decisiones, evidencias y límites de cada resultado.
 
 ## Estado del proyecto
 
+Revisión documental: **2026-10-02**. Evidencia científica conservada: **2026-09-19**; no se han repetido ejecuciones Metashape ni auditorías de datos reales. Los controles offline nuevos usan entradas sintéticas.
+
+El estado descrito corresponde a `feature/validacion-jobxml-y-comparativa-ramas` (`9c8e3d3`) y a cambios locales sin commit. `main` está en `769f788`; la feature añade un commit con auditor JobXML, comparador y pruebas, todavía sin integrar en `main`.
+
 El adaptador activo es **Palmeri Metashape Adapter v0.9.0**, dirigido al entorno revisado Agisoft Metashape Professional 2.3.1. El piloto 2025-04-29 dispone de MASTER y marcado validados; el dictamen geomático del experimento `fixed_model_v1` autoriza ahora únicamente crear de forma no destructiva dos ramas nuevas y detenerse a revisar su informe. No consta que esa preparación haya terminado y no se han generado productos finales comparables.
 
-La campaña 2026 está bloqueada para revisión geomática. El candidato JobXML recibido pasa las reglas del parser si se proporciona explícitamente, pero la ruta local predeterminada de la campaña conserva la copia antigua de 2025. No ejecutar vuelos 2026 ni copiar datos de control a GitHub.
+La campaña 2026 está bloqueada para revisión geomática. La evidencia del 19/09 registra que el candidato pasa las reglas estructurales pero queda `REVIEW_REQUIRED`: identidad, roles GCP/CP, EPSG y unidades sin aceptación, época sin fijar y diagnóstico de proximidad contradictorio con el mapeo. La copia predeterminada local era de 2025; su presencia y huella no se han revalidado hoy. No ejecutar vuelos 2026 ni copiar datos de control a GitHub.
 
 ## Paquetes
 
 - [`palmeri_metashape_adapter_v0_9_0/`](palmeri_metashape_adapter_v0_9_0/README.md): adaptador activo, instrucciones de instalación, operación, validación y pruebas.
 
+Los cinco desarrollos offline están implementados y aceptados técnicamente tras revisión QA y de controles geomáticos independientes: autorización por fase, configuración, integridad byte a byte, HTML de comparación y checker/CI. Desde la raíz, `python tools/check_repository.py` comprueba el repositorio y ejecuta la suite pura sin imágenes ni JobXML reales. Resultado local: 71 pruebas, una omitida por permisos de symlink en Windows; manifiesto de 41 fuentes correcto. La CI remota aún no se ha ejecutado. Esta aceptación técnica no concede nuevas autorizaciones científicas. Véanse [comandos y límites del adaptador](palmeri_metashape_adapter_v0_9_0/README.md#controles-offline).
+
 ## Documentación del proyecto
 
-- [Estado actual](ESTADO_ACTUAL.md): corte 2026-09-18, resultado alcanzado, bloqueos y punto seguro de reanudación.
+- [Estado actual](ESTADO_ACTUAL.md): revisión documental 2026-10-02, evidencia científica al 2026-09-19, bloqueos y punto seguro de reanudación.
 - [Facts](FACTS.md): hechos, decisiones, evidencia y limitaciones metodológicas.
 - [Tareas](TASKS.md): validaciones y desarrollo pendientes.
 - [Manuales locales](manuales/): referencias de Metashape 2.3 y Pix4Dmapper 4.1.
 - [`AGENTS.md`](AGENTS.md): contrato vigente de coordinación, límites científicos, delegación y Git para Codex.
 - Los roles ejecutables vigentes están en `.codex/agents/` y los procedimientos repetibles en `.agents/skills/`.
 
+Codex descubre las skills del proyecto en `.agents/skills/<nombre>/SKILL.md`; cada archivo incluye metadatos YAML `name` y `description`. Invócalas como `$validate-jobxml`, `$review-metashape-run`, `$document-milestone` o `$release-package`. Los perfiles de agentes usan archivos TOML independientes con `name`, `description` y `developer_instructions`; la delegación depende de las capacidades del runtime y sigue los límites de `AGENTS.md`. Resuelve las rutas desde la raíz del repositorio aunque trabajes en una subcarpeta. Formatos según la documentación oficial de [agentes](https://learn.chatgpt.com/docs/agent-configuration/subagents) y [skills](https://learn.chatgpt.com/docs/build-skills).
+
 ## Inicio rápido
+
+El catálogo de esta sesión confirma el descubrimiento de las cuatro skills. La aplicación técnica de perfiles de agentes en el runtime no está verificada; `quick_validate.py` no pudo ejecutarse por ausencia de PyYAML.
 
 Para instalar y operar el adaptador activo, sigue primero su [guía de uso](palmeri_metashape_adapter_v0_9_0/README.md). En resumen, necesitarás Windows, Agisoft Metashape Professional 2.3.x, imágenes originales y los JobXML de control entregados por separado. Los JobXML y otros datos de vuelo se excluyen del repositorio.
 
-La única acción geomática autorizada actualmente es abrir el MASTER 2025-04-29 en Metashape 2.3.1 y ejecutar `scripts/prepare_branches.py`. Después hay que revisar `branch_setup_fixed_model_v1_v0_9_0.json` y detenerse. Preflight, optimización, exportación de métricas, productos y otros vuelos permanecen bloqueados; consulta el [dictamen `fixed_model_v1`](palmeri_metashape_adapter_v0_9_0/FIXED_MODEL_V1_REVIEW.md).
+La única acción geomática autorizada actualmente es abrir el MASTER 2025-04-29 en Metashape 2.3.1 y ejecutar `scripts/prepare_branches.py`. Después hay que revisar `branch_setup_fixed_model_v1_v0_9_0.json` y detenerse. Preflight, optimización, exportación de métricas, productos y otros vuelos permanecen bloqueados; consulta la [fuente histórica del dictamen `fixed_model_v1`](FACTS.md#12-experimento-de-optimización-fixed_model_v1), accesible mediante `git show`.
 
 Las pruebas unitarias puras se ejecutan desde la carpeta del adaptador:
 
