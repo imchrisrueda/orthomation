@@ -6,7 +6,7 @@ Orthomation desarrolla flujos reproducibles para preparar y comparar reconstrucc
 
 Revisión documental: **2026-10-02**. Evidencia científica conservada: **2026-09-19**; no se han repetido ejecuciones Metashape ni auditorías de datos reales. Los controles offline nuevos usan entradas sintéticas.
 
-`main` contiene la integración local hasta `42b9666` y su cierre documental posterior, mediante fast-forward desde `769f788`. Incluye `9c8e3d3` (auditor JobXML, comparador y pruebas) y `42b9666` (controles offline, agentes/skills y documentación revisados). Consulta `git log -1 --oneline` para el HEAD actual. La feature conserva `42b9666`; no se ha hecho push y la CI remota sigue pendiente.
+`main` y `feature/validacion-jobxml-y-comparativa-ramas` están sincronizadas, sin funcionalidades exclusivas de una rama. Conservan la integración desde `769f788`, con `9c8e3d3` (auditor/comparador/pruebas), `42b9666` (controles offline y agentes/skills) y el cierre documental posterior. `main` ya publicó `0a411a0`, que limita CI a Windows; este cierre documenta la sincronización de ambas referencias. Consulta `git log -1 --oneline` y `git branch -vv` para su estado actual. El resultado remoto de CI no se ha comprobado.
 
 El adaptador activo es **Palmeri Metashape Adapter v0.9.0**, dirigido al entorno revisado Agisoft Metashape Professional 2.3.1. El piloto 2025-04-29 dispone de MASTER y marcado validados; el dictamen geomático del experimento `fixed_model_v1` autoriza ahora únicamente crear de forma no destructiva dos ramas nuevas y detenerse a revisar su informe. No consta que esa preparación haya terminado y no se han generado productos finales comparables.
 
@@ -16,7 +16,7 @@ La campaña 2026 está bloqueada para revisión geomática. La evidencia del 19/
 
 - [`palmeri_metashape_adapter_v0_9_0/`](palmeri_metashape_adapter_v0_9_0/README.md): adaptador activo, instrucciones de instalación, operación, validación y pruebas.
 
-Los cinco desarrollos offline están implementados y aceptados técnicamente tras revisión QA y de controles geomáticos independientes: autorización por fase, configuración, integridad byte a byte, HTML de comparación y checker/CI. Desde la raíz, `python tools/check_repository.py` comprueba el repositorio y ejecuta la suite pura sin imágenes ni JobXML reales. Resultado local: 71 pruebas, una omitida por permisos de symlink en Windows; manifiesto de 41 fuentes correcto. La CI remota aún no se ha ejecutado. Esta aceptación técnica no concede nuevas autorizaciones científicas. Véanse [comandos y límites del adaptador](palmeri_metashape_adapter_v0_9_0/README.md#controles-offline).
+Los cinco desarrollos offline están implementados y aceptados técnicamente tras revisión QA y de controles geomáticos independientes: autorización por fase, configuración, integridad byte a byte, HTML de comparación y checker/CI. Desde la raíz, `python tools/check_repository.py` comprueba el repositorio y ejecuta la suite pura sin imágenes ni JobXML reales. Resultado local: 71 pruebas, una omitida por permisos de symlink en Windows; manifiesto de 41 fuentes correcto. El resultado remoto de CI no se ha comprobado. Esta aceptación técnica no concede nuevas autorizaciones científicas. Véanse [comandos y límites del adaptador](palmeri_metashape_adapter_v0_9_0/README.md#controles-offline).
 
 ## Documentación del proyecto
 

@@ -4,7 +4,7 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19.
 
 ## Ámbito del repositorio revisado
 
-`main` contiene la integración local hasta `42b9666` y su cierre documental posterior. El fast-forward desde `769f788` incorpora `9c8e3d3` (auditor/comparador/pruebas) y `42b9666` (controles offline e instrucciones/documentación revisados). Consulta `git log -1 --oneline` para el HEAD actual. `feature/validacion-jobxml-y-comparativa-ramas` conserva `42b9666`. No se ha hecho push ni ejecutado CI remota.
+`main` y `feature/validacion-jobxml-y-comparativa-ramas` están sincronizadas, con los mismos desarrollos y cierre documental. La integración desde `769f788` incorpora `9c8e3d3` (auditor/comparador/pruebas) y `42b9666` (controles offline e instrucciones/documentación revisados). `main` ya publicó `0a411a0`, con CI sólo Windows; la sincronización posterior de la feature elimina diferencias de contenido. Consulta `git log -1 --oneline` y `git branch -vv` para el estado actual. El resultado remoto de CI no se ha comprobado.
 
 Hito de integración del 02/10/2026: código, agentes, skills y documentación revisados están versionados e integrados, con cierre documental posterior al fast-forward. No modifica el corte científico ni las autorizaciones vigentes.
 
@@ -15,9 +15,9 @@ El flujo implementado es RGB P1. Inventario y preparación MASTER admiten varios
 ## Controles offline 2026-10-02 (hito técnico aceptado)
 
 - Cinco desarrollos implementados y aceptados tras dos revisiones estáticas independientes, QA y controles geomáticos: gates por fase, validación estructural de configuración, integridad byte a byte, HTML objetivo y checker/CI. Sólo preparación conserva autorización histórica; preflight, optimización y métricas permanecen `REVIEW_REQUIRED`.
-- `python tools/check_repository.py`: PASS local, 71 pruebas puras sintéticas con una omitida por permisos de symlink; cinco TOML, cuatro skills, enlaces locales y manifiesto de 41 fuentes correctos. No se han ejecutado Metashape, auditorías de datos reales ni CI remota.
+- `python tools/check_repository.py`: PASS local registrado antes de la publicación, 71 pruebas puras sintéticas con una omitida por permisos de symlink; cinco TOML, cuatro skills, enlaces locales y manifiesto de 41 fuentes correctos. No se ejecutaron Metashape ni auditorías de datos reales. El resultado remoto de CI después de publicar no se ha comprobado.
 - Normalizados los finales de línea de fuentes del paquete según `.gitattributes` y regenerado el manifiesto sin cambiar criterios científicos. La configuración exige tipos JSON estrictos y rechaza enteros no representables sin traceback. El hito técnico no concede aprobación humana geomática ni amplía el alcance de procesamiento.
-- Alcance de CI corregido a Windows por indicación del usuario: `windows-latest`, sin matriz Ubuntu. Conserva el checker, los pasos y permisos; la ejecución remota sigue pendiente hasta publicar y ejecutar. Este ajuste documental y de workflow no repite la suite ni modifica gates científicos.
+- Alcance de CI corregido a Windows por indicación del usuario: `windows-latest`, sin matriz Ubuntu. Conserva el checker, los pasos y permisos; tras publicar queda pendiente comprobar el resultado remoto. Este ajuste documental y de workflow no repite la suite ni modifica gates científicos.
 
 ## Revisión de agentes y skills 2026-10-02
 

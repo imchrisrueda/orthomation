@@ -2,12 +2,13 @@
 
 Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no se han repetido ejecuciones Metashape ni auditorías de datos reales.
 
-Ámbito: `main` contiene la integración local hasta `42b9666` y su cierre documental posterior, mediante fast-forward desde `769f788`; incluye `9c8e3d3` y `42b9666`. Consulta `git log -1 --oneline` para el HEAD actual. La feature conserva `42b9666`. No se ha hecho push ni ejecutado CI remota.
+Ámbito: `main` y la feature están sincronizadas, sin funcionalidades exclusivas; conservan la integración desde `769f788`, incluidos `9c8e3d3`, `42b9666` y su cierre documental posterior. `main` ya publicó `0a411a0`; este cierre documenta la sincronización de ambas referencias. Consulta `git log -1 --oneline` y `git branch -vv` para el estado actual. El resultado remoto de CI no se ha comprobado.
 
 ## Integración y controles pendientes
 
 - [x] Revisar e integrar localmente en `main` los commits de la feature con auditor, comparador, controles offline y pruebas mediante fast-forward hasta `42b9666`.
 - [x] Revisar y versionar agentes, skills y documentación en `42b9666`, con cierre documental posterior de la integración.
+- [x] Sincronizar `main` y `feature/validacion-jobxml-y-comparativa-ramas` para conservar los mismos desarrollos y documentación.
 - [x] Aceptar técnicamente tras revisión independiente los gates por fase implementados y probados offline; sólo preparación mantiene autorización histórica, las otras fases siguen bloqueadas.
 - [ ] Definir mediante revisión humana criterios por etapa para selección geométrica y evaluación posterior de productos, resolviendo la cuestión abierta de FACTS §9 sin saltar gates.
 - [ ] Definir y revisar contratos de optimización por vuelo antes de generalizar las huellas y conteos fijos del piloto.
@@ -15,7 +16,7 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no
 
 ## Secuencia prevista y dependencias
 
-1. Con la integración local y su cierre documental completados, especificar los controles científicos pendientes; la CI remota sigue sin ejecutar.
+1. Con la integración y la sincronización de ramas completadas, especificar los controles científicos pendientes y comprobar el resultado remoto de CI.
 2. Reanudar sólo la preparación autorizada, revisar su informe y obtener decisiones humanas antes de cada fase posterior.
 3. Tras autorización, ejecutar preflight, optimizaciones y exportación; comprobar el comparador con métricas reales y documentar la selección humana.
 4. Tras selección y especificación aprobadas, implementar y validar productos y conversión vertical; ampliar vuelos y sensores con sus contratos y abordar Pix4D después. La campaña 2026 conserva su bloqueo independiente.
@@ -28,7 +29,7 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no
 - [x] Ejecutar checker local: 71 pruebas puras, una omitida por permisos de symlink en Windows, configuración e integridad de 41 fuentes correctas; tipos estrictos y entero extremo cubiertos.
 - [x] Obtener PASS técnico estático de QA y controles geomáticos independientes y aceptar el hito sin ampliar autorizaciones científicas.
 - [x] Ajustar el alcance de CI a Windows, plataforma objetivo confirmada por el usuario; conservar el comando offline y sus permisos.
-- [ ] Verificar la ejecución de CI Windows cuando se publique la integración; la integración local está completa, pero no se ha hecho push ni ejecutado CI remota.
+- [ ] Comprobar el resultado de CI Windows después de la publicación; no se ha verificado el resultado remoto.
 
 ## Revisión de agentes y skills 2026-10-02
 
