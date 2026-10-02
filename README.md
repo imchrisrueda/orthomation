@@ -6,7 +6,7 @@ Orthomation desarrolla flujos reproducibles para preparar y comparar reconstrucc
 
 Revisión documental: **2026-10-02**. Evidencia científica conservada: **2026-09-19**; no se han repetido ejecuciones Metashape ni auditorías de datos reales. Los controles offline nuevos usan entradas sintéticas.
 
-El estado descrito corresponde a `feature/validacion-jobxml-y-comparativa-ramas` (`9c8e3d3`) y a cambios locales sin commit. `main` está en `769f788`; la feature añade un commit con auditor JobXML, comparador y pruebas, todavía sin integrar en `main`.
+`main` contiene la integración local hasta `42b9666` y su cierre documental posterior, mediante fast-forward desde `769f788`. Incluye `9c8e3d3` (auditor JobXML, comparador y pruebas) y `42b9666` (controles offline, agentes/skills y documentación revisados). Consulta `git log -1 --oneline` para el HEAD actual. La feature conserva `42b9666`; no se ha hecho push y la CI remota sigue pendiente.
 
 El adaptador activo es **Palmeri Metashape Adapter v0.9.0**, dirigido al entorno revisado Agisoft Metashape Professional 2.3.1. El piloto 2025-04-29 dispone de MASTER y marcado validados; el dictamen geomático del experimento `fixed_model_v1` autoriza ahora únicamente crear de forma no destructiva dos ramas nuevas y detenerse a revisar su informe. No consta que esa preparación haya terminado y no se han generado productos finales comparables.
 

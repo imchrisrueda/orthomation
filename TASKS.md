@@ -2,12 +2,12 @@
 
 Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no se han repetido ejecuciones Metashape ni auditorías de datos reales.
 
-Ámbito: feature `9c8e3d3` y cambios locales sin commit; `main` permanece en `769f788`.
+Ámbito: `main` contiene la integración local hasta `42b9666` y su cierre documental posterior, mediante fast-forward desde `769f788`; incluye `9c8e3d3` y `42b9666`. Consulta `git log -1 --oneline` para el HEAD actual. La feature conserva `42b9666`. No se ha hecho push ni ejecutado CI remota.
 
 ## Integración y controles pendientes
 
-- [ ] Revisar e integrar en `main` el commit existente de la feature con auditor JobXML, comparador y pruebas; las herramientas ya están implementadas.
-- [ ] Revisar y versionar los cambios locales de agentes, skills y documentación.
+- [x] Revisar e integrar localmente en `main` los commits de la feature con auditor, comparador, controles offline y pruebas mediante fast-forward hasta `42b9666`.
+- [x] Revisar y versionar agentes, skills y documentación en `42b9666`, con cierre documental posterior de la integración.
 - [x] Aceptar técnicamente tras revisión independiente los gates por fase implementados y probados offline; sólo preparación mantiene autorización histórica, las otras fases siguen bloqueadas.
 - [ ] Definir mediante revisión humana criterios por etapa para selección geométrica y evaluación posterior de productos, resolviendo la cuestión abierta de FACTS §9 sin saltar gates.
 - [ ] Definir y revisar contratos de optimización por vuelo antes de generalizar las huellas y conteos fijos del piloto.
@@ -15,7 +15,7 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no
 
 ## Secuencia prevista y dependencias
 
-1. Revisar e integrar cambios existentes y especificar controles pendientes.
+1. Con la integración local y su cierre documental completados, especificar los controles científicos pendientes; la CI remota sigue sin ejecutar.
 2. Reanudar sólo la preparación autorizada, revisar su informe y obtener decisiones humanas antes de cada fase posterior.
 3. Tras autorización, ejecutar preflight, optimizaciones y exportación; comprobar el comparador con métricas reales y documentar la selección humana.
 4. Tras selección y especificación aprobadas, implementar y validar productos y conversión vertical; ampliar vuelos y sensores con sus contratos y abordar Pix4D después. La campaña 2026 conserva su bloqueo independiente.
@@ -27,7 +27,7 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no
 - [x] Implementar checker común local/CI y aislar las pruebas del parser con controles sintéticos temporales.
 - [x] Ejecutar checker local: 71 pruebas puras, una omitida por permisos de symlink en Windows, configuración e integridad de 41 fuentes correctas; tipos estrictos y entero extremo cubiertos.
 - [x] Obtener PASS técnico estático de QA y controles geomáticos independientes y aceptar el hito sin ampliar autorizaciones científicas.
-- [ ] Verificar la ejecución de CI Ubuntu/Windows después de integrar los cambios; no se ha publicado ni ejecutado remotamente ahora.
+- [ ] Verificar la ejecución de CI Ubuntu/Windows cuando se publique la integración; la integración local está completa, pero no se ha hecho push ni ejecutado CI remota.
 
 ## Revisión de agentes y skills 2026-10-02
 

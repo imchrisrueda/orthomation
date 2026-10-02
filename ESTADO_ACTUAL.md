@@ -4,7 +4,11 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19.
 
 ## Ámbito del repositorio revisado
 
-La revisión corresponde a `feature/validacion-jobxml-y-comparativa-ramas` (`9c8e3d3`) y cambios locales sin commit; `main` está en `769f788`. La feature añade auditor JobXML, comparador y pruebas, aún sin integrar en `main`.
+`main` contiene la integración local hasta `42b9666` y su cierre documental posterior. El fast-forward desde `769f788` incorpora `9c8e3d3` (auditor/comparador/pruebas) y `42b9666` (controles offline e instrucciones/documentación revisados). Consulta `git log -1 --oneline` para el HEAD actual. `feature/validacion-jobxml-y-comparativa-ramas` conserva `42b9666`. No se ha hecho push ni ejecutado CI remota.
+
+Hito de integración del 02/10/2026: código, agentes, skills y documentación revisados están versionados e integrados, con cierre documental posterior al fast-forward. No modifica el corte científico ni las autorizaciones vigentes.
+
+Verificación posterior a la integración: `python tools/check_repository.py` PASS con 71 pruebas, una omitida por permisos Windows para symlinks e integridad byte a byte de 41 fuentes correcta; `git diff --check` correcto. El paquete y su manifiesto no requieren cambios para este cierre de documentación raíz.
 
 El flujo implementado es RGB P1. Inventario y preparación MASTER admiten varios vuelos, pero la optimización conserva un contrato específico del piloto. Multiespectral, térmico, productos, conversión vertical y Pix4D requieren desarrollo. Las ejecuciones Metashape y auditorías de datos reales siguientes son históricas y no se han repetido hoy; véase [evidencia del código y límites](FACTS.md#14-revisión-del-repositorio-2026-10-02).
 
