@@ -234,4 +234,7 @@ def validate_planning(value):
         return validate_contract(value)
     if kind == "evaluation_protocol":
         return validate_protocol(value)
+    if kind == "common_campaign":
+        from common_campaign_core import validate_common_campaign
+        return validate_common_campaign(value)
     _fail("artifact_type_invalid")

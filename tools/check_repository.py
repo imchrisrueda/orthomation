@@ -115,7 +115,7 @@ def main():
             counts["skills"] += 1
         configuration = validate_configuration(PACKAGE)
         planning = [validate_planning(load_planning(path)) for path in sorted((PACKAGE / "planning").glob("*.json"))]
-        if len(planning) != 2 or {item["artifact_type"] for item in planning} != {"flight_contract", "evaluation_protocol"}:
+        if len(planning) != 3 or {item["artifact_type"] for item in planning} != {"flight_contract", "evaluation_protocol", "common_campaign"}:
             raise ValueError("planning_templates_missing")
         integrity = verify_package(PACKAGE)
         environment = dict(os.environ, PYTHONDONTWRITEBYTECODE="1", PYTHONUTF8="1")

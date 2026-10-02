@@ -39,7 +39,7 @@ python palmeri_metashape_adapter_v0_9_0/scripts/validate_configuration.py
 python tools/verify_package.py
 ```
 
-El checker valida sintaxis AST sin importar Metashape, JSON estricto, TOML y perfiles, el subconjunto escalar `name`/`description` de las cuatro skills (no es un validador YAML universal), enlaces Markdown locales y anchors, configuración, integridad y la suite `test_*.py`. Excluye los smoke de Metashape. El mismo comando está configurado en CI para Windows con Python 3.12, plataforma objetivo confirmada por el usuario; su ejecución remota sigue pendiente hasta publicar y ejecutar.
+El checker valida sintaxis AST sin importar Metashape, JSON estricto, TOML y perfiles, el subconjunto escalar `name`/`description` de las cuatro skills (no es un validador YAML universal), enlaces Markdown locales y anchors, configuración, integridad y la suite `test_*.py`. Excluye los smoke de Metashape. El mismo comando está configurado en CI para Windows con Python 3.12, plataforma objetivo confirmada por el usuario. El CI remoto de la base `40ca7af` está verificado PASS; la [evidencia de CI y publicación por commit](../FACTS.md#16-esquema-común-de-campaña-y-comprobación-ci-2026-10-02) distingue esa base de los incrementos posteriores.
 
 Resultado local del 02/10/2026: checker PASS, 71 pruebas con una omitida por permisos Windows para symlinks y 41 fuentes verificadas byte a byte. Se probaron tipos JSON estrictos y números no representables sin crash de la CLI. Las dos revisiones independientes fueron estáticas; no se ejecutó Metashape ni se revalidaron datos reales. El descubrimiento de las skills está confirmado, pero la aplicación técnica de perfiles de agentes en el runtime sigue sin verificar.
 
@@ -83,3 +83,5 @@ python -m unittest discover -s tests -v
 La suite pura utiliza fixtures sintéticas, incluidos los controles XML temporales del parser; no necesita JobXML ignorados ni datos de campaña. Los smoke de `tests/` requieren Metashape 2.3.1 y las entradas locales autorizadas; no forman parte del checker offline.
 
 La [preparación offline de contratos por vuelo y protocolo de evaluación](planning/README.md) dispone de borradores JSON estrictos y una CLI de validación. Es independiente de las configuraciones operativas y conserva todos los gates humanos.
+
+Incluye también una [plantilla documental de campaña común RGB P1](planning/_template_common_campaign.json), con referencias separadas por vuelo y motor. No constituye un importador ni establece compatibilidad/equivalencia Metashape–Pix4D.

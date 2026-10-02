@@ -24,3 +24,26 @@ CP C2/C5 se informan individualmente y agregados por separado de GCP, que repres
 Limitaciones heredadas del comparador (FACTS §12/13): no verifica de nuevo CRS/GNSS/P1, huella exacta de imágenes ni ausencia actual de productos. La observación completa de parámetros efectivos posteriores y correcciones adicionales en API 2.3.1 sigue pendiente. Esta preparación sólo reserva evidencia declarada y no subsana esas limitaciones. Los contratos reales y el protocolo requieren aceptación geomática humana antes de cualquier especificación operativa posterior.
 
 `reference_metadata` reserva datum, referencia elipsoidal de altura y época declarados, todos inicialmente nulos y con aceptación NOT_GRANTED. Cada valor requiere procedencia documental en la evidencia correspondiente. La época se expresa como cadena de año decimal (`YYYY` o `YYYY.fracción`, hasta ocho decimales), sin conversión numérica ni rango geodésico asumido. `source_review_status` conserva DRAFT/REVIEW_REQUIRED/REJECTED del documento; el estado del informe no revoca un rechazo.
+
+## Campaña común documental
+
+[_template_common_campaign.json](_template_common_campaign.json) añade un borrador `common-campaign-1`, independiente del contrato Metashape `planning-1`. Es una preparación RGB P1 neutral respecto del motor: ninguno de los dos motores consume este esquema. Ambos bindings permanecen `UNVERIFIED` y sus adaptadores al esquema común `NOT_IMPLEMENTED`. El flujo RGB existente de Metashape conserva su configuración propia. No hay importador, mapeo automático, presets comunes ni equivalencia entre motores. Multiespectral y térmico quedan fuera de este esquema.
+
+Se distinguen requisitos propuestos (`*_policy`, `comparison_requirements`), datos declarados (`identity`, vuelos, conteo aceptado, versión/edición/licencia del motor), evidencia referenciada (`sha256`, `documentary_source`) y aceptación humana, que siempre sigue `NOT_GRANTED`. La descripción de licencia es un campo documental, sin verificación de licencia ni credenciales. Los metadatos de datum, época y referencia de altura son independientes para cámaras y control por vuelo; un valor declarado exige procedencia, sin lectura ni validación de su contenido. La época conserva el formato textual `YYYY[.fracción]`.
+
+| Campo común | Fuente actual o requisito del proyecto | Mapeo a motores |
+|---|---|---|
+| Identidad y vuelos | FACTS §1; fechas e inventarios declarados por campaña | Documental; asociación operativa pendiente en ambos |
+| Sensor RGB P1, 8192×5460 y bandas RGB | Propuesta según FACTS §2; no comprobación de imágenes | Adaptadores del esquema común no implementados |
+| Altura de cámara y precisiones | XMP `drone-dji:AbsoluteAltitude`, `RtkStdLon`, `RtkStdLat`, `RtkStdHgt`, parser `orthomation_core.py`; FACTS §§2, 4, 5 | Fuente existente Metashape; mapeo Pix4D no verificado |
+| Control y alturas separadas | JobXML `WGS84/Height` → h; `Grid/Elevation` → H; FACTS §§3–4 | h para ajuste; H sólo transformación posterior explícita validada |
+| Precisión terrestre | JobXML precisión `Horizontal`/`Vertical`, metros y 1σ según FACTS §5 | X=Y=Horizontal es aproximación vigente sólo Metashape, no sigmas independientes X/Y ni asignación de ponderación Pix4D |
+| Roles propuestos y marcado | E1/E3/E4/E6 GCP; C2/C5 CP; FACTS §§3, 8 | Sin JobIDs reales ni marcado; evidencia y revisión por vuelo pendientes |
+| Referencia horizontal/vertical | Cámaras 4326+h; control/salida 25830+h; FACTS §3–5 | Propuesta con datum/época documentados pendientes, sin autorización geodésica |
+| Conjunto de imágenes aceptado | Inventario total, conjunto aceptado, decisión y exclusiones humanas; FACTS §7–8 | Igualdad requerida para comparación; hash declarado no prueba identidad |
+| Ramas y protocolo | FACTS §8–10, protocolo DRAFT referido por huella | Camera XYZ OFF en GCP_ONLY y ON en GCP_P1, rotación OFF y CP fuera del ajuste; MASTER común y parámetros idénticos sólo en comparación Metashape; sin traslado a Pix4D |
+| Versión/edición/licencia y capacidad | Declaración `major.minor.patch` y evidencia documental específica de cada motor | No se afirman capacidades Pix4D ni compatibilidad de versiones |
+
+`flights` requiere al menos un registro, que puede ser un placeholder incompleto. Los IDs concretos son únicos; las referencias a contratos usan un ID existente y la misma fecha declarada del vuelo. No se admiten duplicados `(engine, flight_id)` ni fechas contradictorias. Una lista de referencias vacía sigue estructuralmente válida y señala una referencia pendiente por vuelo/motor. Las referencias Metashape reservan `planning-1/flight_contract`; el contrato Pix4D permanece `NOT_DESIGNED`, y no puede reutilizar ese contrato de optimización. Ni las referencias ni la evidencia de protocolo se abren.
+
+Incluso con todos los campos declarados, el informe mantiene `evidence_verified=false`, `compatibility_verified=false`, equivalencia entre motores `NOT_ESTABLISHED`, ambos permisos falsos y `NOT_EXECUTABLE`. Completitud sólo describe campos; no acredita autenticidad, compatibilidad, igualdad de entradas ni aceptación humana. Los dos CP siguen proporcionando evidencia exploratoria, sin extrapolación espacial. La CLI sin argumentos valida ahora los tres borradores.

@@ -2,7 +2,7 @@
 
 Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no se han repetido ejecuciones Metashape ni auditorías de datos reales.
 
-Ámbito: `main` y la feature están sincronizadas, sin funcionalidades exclusivas; conservan la integración desde `769f788`, incluidos `9c8e3d3`, `42b9666` y su cierre documental posterior. `main` ya publicó `0a411a0`; este cierre documenta la sincronización de ambas referencias. Consulta `git log -1 --oneline` y `git branch -vv` para el estado actual. El resultado remoto de CI no se ha comprobado.
+Ámbito: la base común publicada de `main` y la feature es `40ca7af`; conserva la integración y la configuración CI Windows. El primer incremento de preparación se versionó en `a2f9497`; el esquema común se prepara para publicación. Consulta `git log -1 --oneline` y `git branch -vv` para las referencias actuales. El CI de `40ca7af` en ambas ramas está comprobado como PASS; véase [FACTS §16](FACTS.md#16-esquema-común-de-campaña-y-comprobación-ci-2026-10-02).
 
 ## Integración y controles pendientes
 
@@ -16,7 +16,7 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no
 
 ## Secuencia prevista y dependencias
 
-1. Con la integración y la sincronización de ramas completadas, especificar los controles científicos pendientes y comprobar el resultado remoto de CI.
+1. Con el CI de la base publicado comprobado, completar las revisiones humanas de los controles científicos pendientes y verificar CI después de cada publicación nueva.
 2. Reanudar sólo la preparación autorizada, revisar su informe y obtener decisiones humanas antes de cada fase posterior.
 3. Tras autorización, ejecutar preflight, optimizaciones y exportación; comprobar el comparador con métricas reales y documentar la selección humana.
 4. Tras selección y especificación aprobadas, implementar y validar productos y conversión vertical; ampliar vuelos y sensores con sus contratos y abordar Pix4D después. La campaña 2026 conserva su bloqueo independiente.
@@ -30,7 +30,15 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no
 - [ ] Completar contratos reales con evidencia y revisión geomática humana; el runtime conserva el contrato específico del piloto y no consume estos borradores.
 - [ ] Aceptar mediante revisión humana los criterios por etapa y la comunicación de incertidumbre; el protocolo es una propuesta y FACTS §9 permanece abierta.
 
-Guía: [preparación offline](palmeri_metashape_adapter_v0_9_0/planning/README.md). Los pendientes de criterios y contratos de la sección de integración no se consideran completados por esta implementación. No se han ejecutado Metashape ni auditorías de datos reales; el incremento está en el árbol local, sin commit ni publicación en este lote.
+Guía: [preparación offline](palmeri_metashape_adapter_v0_9_0/planning/README.md). Los pendientes de criterios y contratos de la sección de integración no se consideran completados por esta implementación. No se han ejecutado Metashape ni auditorías de datos reales; el incremento se versionó posteriormente en `a2f9497`, con publicación tratada en el hito siguiente.
+
+## Esquema común y comprobación CI 2026-10-02 (hito técnico aceptado)
+
+- [x] Comprobar CI Windows de `40ca7af` en `main` y feature: ambas ejecuciones completadas con éxito y evidencia enlazada en FACTS §16.
+- [x] Preparar esquema común documental `common-campaign-1` para RGB P1, con validación de vuelos, referencias a contratos y evidencia declarada por motor; sin importadores ni equivalencia científica.
+- [x] Integrar la tercera plantilla en CLI/checker, añadir 12 pruebas sintéticas y obtener PASS técnico estático de QA y revisión geomática independientes. Checker local: 100 pruebas, una omitida; manifiesto de 50 fuentes correcto.
+- [ ] Publicar los dos incrementos revisados y documentados y comprobar su CI remoto.
+- [ ] Diseñar contratos y mapeos operativos Pix4D con evidencia primaria; la plantilla común no implementa ni valida esas capacidades.
 
 ## Desarrollos offline 2026-10-02 (hito técnico aceptado)
 
@@ -40,7 +48,7 @@ Guía: [preparación offline](palmeri_metashape_adapter_v0_9_0/planning/README.m
 - [x] Ejecutar checker local: 71 pruebas puras, una omitida por permisos de symlink en Windows, configuración e integridad de 41 fuentes correctas; tipos estrictos y entero extremo cubiertos.
 - [x] Obtener PASS técnico estático de QA y controles geomáticos independientes y aceptar el hito sin ampliar autorizaciones científicas.
 - [x] Ajustar el alcance de CI a Windows, plataforma objetivo confirmada por el usuario; conservar el comando offline y sus permisos.
-- [ ] Comprobar el resultado de CI Windows después de la publicación; no se ha verificado el resultado remoto.
+- [x] Comprobar el resultado de CI Windows de la base publicada `40ca7af`: PASS en ambas ramas; las nuevas publicaciones se verifican por commit en el hito siguiente.
 
 ## Revisión de agentes y skills 2026-10-02
 
@@ -112,7 +120,7 @@ Guía: [preparación offline](palmeri_metashape_adapter_v0_9_0/planning/README.m
 ## Adaptador Pix4D pendiente
 
 - [ ] Confirmar instalación, licencia y posibilidades de automatización de Pix4Dmapper 4.1.
-- [ ] Diseñar esquema común de campaña sin reutilizar llamadas Metashape.
+- [x] Preparar esquema común documental de campaña RGB P1, sin llamadas de motores; implementación y aceptación operativas permanecen pendientes.
 - [ ] Mapear JobXML/XMP, GCP/CP y referencia vertical a Pix4D.
 - [ ] Reproducir el mismo conjunto de imágenes y roles.
 - [ ] Extraer métricas y productos comparables con Metashape.

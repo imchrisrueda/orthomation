@@ -1,0 +1,252 @@
+{
+  "schema_version": "common-campaign-1",
+  "artifact_type": "common_campaign",
+  "review_status": "DRAFT",
+  "identity": {
+    "campaign_id": null,
+    "name": null,
+    "document_version": null
+  },
+  "boundaries": {
+    "execution_authorized": false,
+    "products_authorized": false,
+    "geomatic_acceptance": "NOT_GRANTED"
+  },
+  "sensor_policy": {
+    "status": "PROPOSED",
+    "source": "project_policy",
+    "acceptance": "NOT_GRANTED",
+    "sensor": "DJI Zenmuse P1",
+    "kind": "RGB",
+    "width_px": 8192,
+    "height_px": 5460,
+    "bands": [
+      "R",
+      "G",
+      "B"
+    ],
+    "dimension_units": "pixel"
+  },
+  "reference_policy": {
+    "status": "PROPOSED",
+    "source": "project_policy",
+    "acceptance": "NOT_GRANTED",
+    "camera_crs": "EPSG::4326",
+    "control_crs": "EPSG::25830",
+    "output_horizontal_crs": "EPSG::25830",
+    "camera_height": "h_ellipsoidal",
+    "control_height": "h_ellipsoidal",
+    "output_height": "h_ellipsoidal",
+    "camera_horizontal_units": "degree",
+    "control_horizontal_units": "metre",
+    "height_units": "metre",
+    "posterior_orthometric_reference": "H_EGM08IGN_ONLY_EXPLICIT_VALIDATED_TRANSFORMATION"
+  },
+  "control_policy": {
+    "status": "PROPOSED",
+    "source": "project_policy",
+    "acceptance": "NOT_GRANTED",
+    "roles": {
+      "E1": "GCP",
+      "E3": "GCP",
+      "E4": "GCP",
+      "E6": "GCP",
+      "C2": "CHECK_POINT",
+      "C5": "CHECK_POINT"
+    },
+    "cp_scope": "TWO_CP_EXPLORATORY_NO_SPATIAL_EXTRAPOLATION",
+    "jobxml_adjustment_height_source": "WGS84/Height_h_ellipsoidal",
+    "jobxml_orthometric_height_source": "Grid/Elevation_H_SEPARATE_NOT_FOR_ADJUSTMENT",
+    "precision_interpretation": "ONLY_EXISTING_METASHAPE_APPROXIMATION_NOT_INDEPENDENT_COMPONENT_SIGMAS"
+  },
+  "camera_source_policy": {
+    "source": "project_policy",
+    "status": "PROPOSED",
+    "acceptance": "NOT_GRANTED",
+    "height_source": "XMP_AbsoluteAltitude_h_ellipsoidal",
+    "precision_sources": [
+      "XMP_RtkStdLon",
+      "XMP_RtkStdLat",
+      "XMP_RtkStdHgt"
+    ],
+    "additional_lever_arm": false
+  },
+  "comparison_requirements": {
+    "status": "PROPOSED",
+    "acceptance": "NOT_GRANTED",
+    "source": "project_policy",
+    "same_accepted_image_set": "REQUIRED_NOT_VERIFIED_BY_DECLARED_HASH",
+    "cross_engine_compatibility": "NOT_ESTABLISHED",
+    "cross_engine_equivalence": "NOT_ESTABLISHED",
+    "metashape_only": {
+      "branches": [
+        "GCP_ONLY",
+        "GCP_P1"
+      ],
+      "gcp_enabled": [
+        "E1",
+        "E3",
+        "E4",
+        "E6"
+      ],
+      "cp_enabled": false,
+      "camera_rotation_enabled": false,
+      "camera_xyz_enabled": {
+        "GCP_ONLY": false,
+        "GCP_P1": true
+      },
+      "only_camera_xyz_constraints_vary": true,
+      "parameters": "IDENTICAL_REQUIRED_NOT_VERIFIED",
+      "master": "COMMON_REQUIRED_NOT_VERIFIED"
+    }
+  },
+  "flights": [
+    {
+      "flight_id": null,
+      "flight_date": null,
+      "accepted_image_count": null,
+      "image_evidence": {
+        "total_inventory": {
+          "sha256": null,
+          "documentary_source": null
+        },
+        "accepted_set": {
+          "sha256": null,
+          "documentary_source": null
+        },
+        "human_acceptance": {
+          "sha256": null,
+          "documentary_source": null
+        },
+        "human_exclusions": {
+          "sha256": null,
+          "documentary_source": null
+        }
+      },
+      "control_evidence": {
+        "jobxml": {
+          "sha256": null,
+          "documentary_source": null
+        },
+        "marking": {
+          "sha256": null,
+          "documentary_source": null
+        },
+        "identity_role_review": {
+          "sha256": null,
+          "documentary_source": null
+        },
+        "precisions": {
+          "sha256": null,
+          "documentary_source": null
+        }
+      },
+      "reference_metadata": {
+        "camera": {
+          "datum": {
+            "value": null,
+            "documentary_source": null
+          },
+          "coordinate_epoch": {
+            "value": null,
+            "documentary_source": null
+          },
+          "ellipsoidal_height_reference": {
+            "value": null,
+            "documentary_source": null
+          }
+        },
+        "control": {
+          "datum": {
+            "value": null,
+            "documentary_source": null
+          },
+          "coordinate_epoch": {
+            "value": null,
+            "documentary_source": null
+          },
+          "ellipsoidal_height_reference": {
+            "value": null,
+            "documentary_source": null
+          }
+        },
+        "acceptance": "NOT_GRANTED"
+      },
+      "metashape_comparison_evidence": {
+        "common_master": {
+          "sha256": null,
+          "documentary_source": null
+        },
+        "identical_parameters": {
+          "sha256": null,
+          "documentary_source": null
+        },
+        "branch_constraints": {
+          "sha256": null,
+          "documentary_source": null
+        }
+      }
+    }
+  ],
+  "engine_bindings": {
+    "metashape": {
+      "version": null,
+      "edition": null,
+      "license_description": null,
+      "capability_evidence": {
+        "sha256": null,
+        "documentary_source": null
+      },
+      "mapping_evidence": {
+        "sha256": null,
+        "documentary_source": null
+      },
+      "mapping_status": "UNVERIFIED",
+      "common_schema_adapter_status": "NOT_IMPLEMENTED"
+    },
+    "pix4dmapper": {
+      "version": null,
+      "edition": null,
+      "license_description": null,
+      "capability_evidence": {
+        "sha256": null,
+        "documentary_source": null
+      },
+      "mapping_evidence": {
+        "sha256": null,
+        "documentary_source": null
+      },
+      "mapping_status": "UNVERIFIED",
+      "common_schema_adapter_status": "NOT_IMPLEMENTED"
+    }
+  },
+  "flight_contract_references": [
+    {
+      "engine": "metashape",
+      "flight_id": null,
+      "flight_date": null,
+      "contract_schema": "planning-1",
+      "contract_type": "flight_contract",
+      "mapping_status": "UNVERIFIED",
+      "sha256": null,
+      "documentary_source": null
+    },
+    {
+      "engine": "pix4dmapper",
+      "flight_id": null,
+      "flight_date": null,
+      "contract_schema": "NOT_DESIGNED",
+      "contract_type": "NOT_DESIGNED",
+      "mapping_status": "UNVERIFIED",
+      "sha256": null,
+      "documentary_source": null
+    }
+  ],
+  "evaluation_protocol_reference": {
+    "schema_version": "planning-1",
+    "artifact_type": "evaluation_protocol",
+    "review_status": "DRAFT",
+    "sha256": null,
+    "documentary_source": null
+  }
+}

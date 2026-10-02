@@ -17,7 +17,8 @@ def main(argv=None):
         code = 2
     else:
         base = Path(__file__).resolve().parents[1] / "planning"
-        paths = [Path(args[0])] if args else [base / "_template_flight_contract.json", base / "evaluation_protocol.json"]
+        paths = [Path(args[0])] if args else [base / "_template_flight_contract.json", base / "evaluation_protocol.json",
+                                            base / "_template_common_campaign.json"]
         try:
             reports = [validate_planning(load_planning(path)) for path in paths]
             result = {"structural_status": "PASS", "structure_valid": True, "drafts": reports, **BOUNDARIES}
