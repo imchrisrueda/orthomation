@@ -81,3 +81,5 @@ python -m unittest discover -s tests -v
 ```
 
 La suite pura utiliza fixtures sintéticas, incluidos los controles XML temporales del parser; no necesita JobXML ignorados ni datos de campaña. Los smoke de `tests/` requieren Metashape 2.3.1 y las entradas locales autorizadas; no forman parte del checker offline.
+
+La [preparación offline de contratos por vuelo y protocolo de evaluación](planning/README.md) dispone de borradores JSON estrictos y una CLI de validación. Es independiente de las configuraciones operativas y conserva todos los gates humanos.

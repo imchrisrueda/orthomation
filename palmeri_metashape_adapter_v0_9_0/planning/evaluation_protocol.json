@@ -1,0 +1,90 @@
+{
+  "schema_version": "planning-1",
+  "artifact_type": "evaluation_protocol",
+  "review_status": "DRAFT",
+  "boundaries": {
+    "execution_authorized": false,
+    "products_authorized": false,
+    "geomatic_acceptance": "NOT_GRANTED"
+  },
+  "proposal_status": "HUMAN_ACCEPTANCE_REQUIRED_FACTS_9_OPEN",
+  "geometry_stage": {
+    "gate": "BEFORE_PRODUCTS",
+    "selection": "HUMAN_ONLY_NO_RANKING_OR_THRESHOLDS",
+    "existing_metric_sources": [
+      "metrics.marker_summary_by_role",
+      "metrics.check_points",
+      "metrics.marker_reprojection_all",
+      "metrics.marker_reprojection_by_role",
+      "metrics.tie_points",
+      "metrics.calibration_by_sensor_key"
+    ],
+    "check_points": [
+      "C2",
+      "C5"
+    ],
+    "gcp_interpretation": "INTERNAL_ADJUSTMENT_SEPARATE_FROM_CP",
+    "cp_reporting": {
+      "individual_residuals": true,
+      "bias_axes": [
+        "x",
+        "y",
+        "z"
+      ],
+      "rmse_axes": [
+        "x",
+        "y",
+        "z",
+        "xy",
+        "3d"
+      ]
+    },
+    "comparability": [
+      "jobxml",
+      "image_inventory",
+      "human_image_acceptance",
+      "human_exclusions",
+      "common_master",
+      "configuration",
+      "marking_and_projections",
+      "sensors_and_initial_calibration",
+      "branch_parameters_and_constraints"
+    ],
+    "reprojection_interpretation": "PIXEL_CONSISTENCY_NOT_EXTERNAL_ACCURACY",
+    "calibration_interpretation": "DIAGNOSTIC_CHANGE_NOT_PROOF_OF_OVERFITTING"
+  },
+  "product_stage": {
+    "gate": "AFTER_RECORDED_HUMAN_GEOMETRIC_SELECTION_AND_PRODUCT_AUTHORIZATION",
+    "metrics_to_specify": [
+      "density",
+      "completeness",
+      "noise",
+      "GSD",
+      "DSM_DTM",
+      "resolution",
+      "NoData",
+      "seamlines",
+      "radiometry",
+      "coverage",
+      "3D"
+    ],
+    "algorithms_or_thresholds_defined": false
+  },
+  "conventions": {
+    "residual_sign": "estimated-reference",
+    "residual_frame": "COMPARATOR_LOCAL_FRAME_AT_ESTIMATED_POSITION",
+    "residual_units": "metre",
+    "reprojection_units": "pixel",
+    "calibration_units": "native_per_parameter",
+    "crs_25830_deltas": "SEPARATE_DIAGNOSTIC_NOT_FOR_RMSE",
+    "branch_delta": "GCP_P1-GCP_ONLY",
+    "adjustment_height": "h_ellipsoidal",
+    "orthometric_height": "H_ONLY_BY_EXPLICIT_VALIDATED_POSTERIOR_TRANSFORMATION"
+  },
+  "uncertainty": {
+    "two_cp": "EXPLORATORY_NOT_ROBUST_CHARACTERIZATION",
+    "spatial_extrapolation": false,
+    "confidence_intervals_from_two_cp": false,
+    "statistical_thresholds_defined": false
+  }
+}

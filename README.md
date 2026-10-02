@@ -18,6 +18,8 @@ La campaña 2026 está bloqueada para revisión geomática. La evidencia del 19/
 
 Los cinco desarrollos offline están implementados y aceptados técnicamente tras revisión QA y de controles geomáticos independientes: autorización por fase, configuración, integridad byte a byte, HTML de comparación y checker/CI. Desde la raíz, `python tools/check_repository.py` comprueba el repositorio y ejecuta la suite pura sin imágenes ni JobXML reales. Resultado local: 71 pruebas, una omitida por permisos de symlink en Windows; manifiesto de 41 fuentes correcto. El resultado remoto de CI no se ha comprobado. Esta aceptación técnica no concede nuevas autorizaciones científicas. Véanse [comandos y límites del adaptador](palmeri_metashape_adapter_v0_9_0/README.md#controles-offline).
 
+Incremento local posterior: [contratos por vuelo y protocolo de evaluación en borrador](palmeri_metashape_adapter_v0_9_0/planning/README.md), con validador offline integrado en el checker. QA y revisión geomática independientes emitieron PASS técnico; checker completo: 88 pruebas, una omitida, y 47 fuentes verificadas. Los borradores no autentican evidencia ni se consumen por el runtime; contratos reales y criterios siguen pendientes de aceptación humana. Este incremento no se ha versionado ni publicado.
+
 ## Documentación del proyecto
 
 - [Estado actual](ESTADO_ACTUAL.md): revisión documental 2026-10-02, evidencia científica al 2026-09-19, bloqueos y punto seguro de reanudación.

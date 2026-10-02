@@ -12,9 +12,11 @@ from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = ROOT / "palmeri_metashape_adapter_v0_9_0"
+sys.dont_write_bytecode = True
 sys.path.insert(0, str(PACKAGE / "scripts"))
 from configuration_core import load_configuration, validate_configuration
 from package_integrity import source_files, verify_package
+from planning_core import load_planning, validate_planning
 
 
 def frontmatter(path):
@@ -112,6 +114,9 @@ def main():
             frontmatter(path)
             counts["skills"] += 1
         configuration = validate_configuration(PACKAGE)
+        planning = [validate_planning(load_planning(path)) for path in sorted((PACKAGE / "planning").glob("*.json"))]
+        if len(planning) != 2 or {item["artifact_type"] for item in planning} != {"flight_contract", "evaluation_protocol"}:
+            raise ValueError("planning_templates_missing")
         integrity = verify_package(PACKAGE)
         environment = dict(os.environ, PYTHONDONTWRITEBYTECODE="1", PYTHONUTF8="1")
         tests = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", str(PACKAGE / "tests"), "-p", "test_*.py", "-v"], cwd=ROOT, env=environment, capture_output=True, text=True)
@@ -122,7 +127,7 @@ def main():
         verify_package(PACKAGE)
         summary = re.search(r"Ran (\d+) tests?", tests.stderr)
         skipped = re.search(r"skipped=(\d+)", tests.stderr)
-        result.update(status="PASS", checks=counts, configuration=configuration, integrity=integrity,
+        result.update(status="PASS", checks=counts, configuration=configuration, planning=planning, integrity=integrity,
                       pure_test_count=int(summary[1]) if summary else None,
                       skipped_test_count=int(skipped[1]) if skipped else 0, tests="PASS")
     except (ValueError, OSError, SyntaxError, TypeError, KeyError) as exc:

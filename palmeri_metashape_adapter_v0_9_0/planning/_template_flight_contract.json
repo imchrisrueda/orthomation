@@ -1,0 +1,128 @@
+{
+  "schema_version": "planning-1",
+  "artifact_type": "flight_contract",
+  "review_status": "DRAFT",
+  "identity": {
+    "campaign_id": null,
+    "flight_date": null,
+    "run_id": null,
+    "version": null,
+    "metashape_version": null
+  },
+  "boundaries": {
+    "execution_authorized": false,
+    "products_authorized": false,
+    "geomatic_acceptance": "NOT_GRANTED"
+  },
+  "proposed_reference": {
+    "source": "project_policy",
+    "acceptance": "NOT_GRANTED",
+    "status": "PROPOSED",
+    "camera_crs": "EPSG::4326",
+    "marker_crs": "EPSG::25830",
+    "chunk_crs": "EPSG::25830",
+    "camera_height": "h_ellipsoidal",
+    "marker_height": "h_ellipsoidal",
+    "marker_coordinate_units": "metre",
+    "camera_horizontal_units": "degree",
+    "height_units": "metre",
+    "roles": {
+      "E1": "GCP",
+      "E3": "GCP",
+      "E4": "GCP",
+      "E6": "GCP",
+      "C2": "CHECK_POINT",
+      "C5": "CHECK_POINT"
+    }
+  },
+  "reference_metadata": {
+    "datum": null,
+    "ellipsoidal_height_reference": null,
+    "coordinate_epoch": null,
+    "acceptance": "NOT_GRANTED"
+  },
+  "optimization_contract": {
+    "fit_f": true,
+    "fit_cx": true,
+    "fit_cy": true,
+    "fit_b1": false,
+    "fit_b2": false,
+    "fit_k1": true,
+    "fit_k2": true,
+    "fit_k3": true,
+    "fit_k4": false,
+    "fit_p1": true,
+    "fit_p2": true,
+    "fit_corrections": false,
+    "adaptive_fitting": false,
+    "tiepoint_covariance": true
+  },
+  "evidence": {
+    "jobxml": {
+      "sha256": null,
+      "documentary_source": null
+    },
+    "image_inventory": {
+      "sha256": null,
+      "documentary_source": null
+    },
+    "human_image_acceptance": {
+      "sha256": null,
+      "documentary_source": null
+    },
+    "human_exclusions": {
+      "sha256": null,
+      "documentary_source": null
+    },
+    "common_master": {
+      "sha256": null,
+      "documentary_source": null
+    },
+    "configuration": {
+      "sha256": null,
+      "documentary_source": null
+    },
+    "marking_and_projections": {
+      "sha256": null,
+      "documentary_source": null
+    },
+    "sensors_and_initial_calibration": {
+      "sha256": null,
+      "documentary_source": null
+    },
+    "branch_parameters_and_constraints": {
+      "sha256": null,
+      "documentary_source": null
+    },
+    "datum": {
+      "sha256": null,
+      "documentary_source": null
+    },
+    "coordinate_epoch": {
+      "sha256": null,
+      "documentary_source": null
+    }
+  },
+  "expected_counts": {
+    "cameras": null,
+    "transform_components": null
+  },
+  "phases": {
+    "prepare_branches": {
+      "status": "REVIEW_REQUIRED",
+      "documentary_source": null
+    },
+    "preflight": {
+      "status": "REVIEW_REQUIRED",
+      "documentary_source": null
+    },
+    "optimization": {
+      "status": "REVIEW_REQUIRED",
+      "documentary_source": null
+    },
+    "metrics_export": {
+      "status": "REVIEW_REQUIRED",
+      "documentary_source": null
+    }
+  }
+}

@@ -21,6 +21,17 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no
 3. Tras autorización, ejecutar preflight, optimizaciones y exportación; comprobar el comparador con métricas reales y documentar la selección humana.
 4. Tras selección y especificación aprobadas, implementar y validar productos y conversión vertical; ampliar vuelos y sensores con sus contratos y abordar Pix4D después. La campaña 2026 conserva su bloqueo independiente.
 
+## Preparación de contratos y protocolo 2026-10-02 (hito técnico aceptado)
+
+- [x] Implementar plantillas DRAFT de contrato por vuelo y protocolo de evaluación, separadas de las configuraciones operativas.
+- [x] Implementar CLI offline de validación estricta y diagnóstico redactado de campos pendientes, sin abrir evidencia referenciada ni autorizar ejecución.
+- [x] Integrar los borradores en el checker y probar límites de autorización, tipos, metadatos, redacción y ausencia de escritura/bytecode: 17 pruebas nuevas; checker PASS con 88 pruebas, una omitida; manifiesto de 47 fuentes correcto.
+- [x] Obtener PASS técnico estático de QA y revisión geomática independientes, corregir sus hallazgos y aceptar exclusivamente el desarrollo offline.
+- [ ] Completar contratos reales con evidencia y revisión geomática humana; el runtime conserva el contrato específico del piloto y no consume estos borradores.
+- [ ] Aceptar mediante revisión humana los criterios por etapa y la comunicación de incertidumbre; el protocolo es una propuesta y FACTS §9 permanece abierta.
+
+Guía: [preparación offline](palmeri_metashape_adapter_v0_9_0/planning/README.md). Los pendientes de criterios y contratos de la sección de integración no se consideran completados por esta implementación. No se han ejecutado Metashape ni auditorías de datos reales; el incremento está en el árbol local, sin commit ni publicación en este lote.
+
 ## Desarrollos offline 2026-10-02 (hito técnico aceptado)
 
 - [x] Implementar gates por fase y verificación de integridad previa a preparación, conservando los contratos científicos.

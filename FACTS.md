@@ -205,3 +205,22 @@ Los cambios revisados se versionaron en `42b9666` y se integraron en `main` medi
 ### Sincronización y publicación de ramas
 
 `main` publicó `0a411a0` y la feature se avanzó mediante fast-forward al mismo contenido. Ambas ramas conservan los mismos desarrollos y cierre documental, sin funcionalidades exclusivas. Este cierre documenta la sincronización de las dos referencias sin fijar el hash de su propio commit. Fuentes comprobables: `git log -1 --oneline`, el historial Git y `git branch -vv`. El resultado remoto de CI tras la publicación no se ha comprobado; el PASS local de 71 pruebas sigue siendo evidencia local, no un resultado de GitHub Actions.
+
+## 15. Preparación offline de contratos y evaluación 2026-10-02
+
+### Hechos técnicos y evidencia
+
+- `scripts/planning_core.py` y `scripts/validate_planning.py` validan propuestas JSON con esquema propio `planning-1`, sin importar Metashape, abrir evidencia referenciada ni generar archivos. La CLI devuelve `0` por estructura válida, incluso incompleta, `1` por documento inválido y `2` por uso incorrecto; sus diagnósticos no incluyen valores, huellas ni rutas suministradas.
+- `planning/_template_flight_contract.json` reserva identidad, versión exacta declarada de Metashape, datum, referencia elipsoidal, época, conteos y procedencia/huellas de evidencia para imágenes aceptadas/excluidas, control, MASTER común, marcado, calibración y restricciones. Los valores pendientes son `null`; roles, CRS y unidades son propuestas de política con aceptación `NOT_GRANTED`, sin aceptar identidad o roles de 2026.
+- `structure_valid` y `evidence_complete` distinguen estructura y presencia de campos declarados. Incluso un borrador completo sigue `NOT_EXECUTABLE`, `evidence_verified=false`, sin aceptación geomática ni permiso de ejecución/productos. `source_review_status` conserva el estado original, incluido `REJECTED`. No existe promotor operativo; los scripts científicos no consumen estos borradores ni generalizan el contrato del piloto.
+- `tools/check_repository.py` integra la validación de las dos plantillas. `tests/test_planning.py`: 17 pruebas nuevas sintéticas, incluidos intentos de conceder autorización, JSON adversarial, metadatos y prueba de proceso nuevo sin escritura/bytecode. Checker completo PASS con 88 pruebas, una omitida por permisos Windows para symlinks; manifiesto byte a byte de 47 fuentes correcto. QA verificó independientemente los hashes y el diff; QA y revisión geomática emitieron PASS técnico estático tras corregir los hallazgos.
+- Este incremento permanece local, sin commit ni publicación. No se ha ejecutado Metashape ni auditado datos científicos reales; el resultado remoto de CI sigue sin comprobarse. Se conserva el corte científico del 19/09 y la autorización exclusiva de preparación de §12.
+
+### Propuesta y cuestiones abiertas
+
+- `planning/evaluation_protocol.json` propone evaluación geométrica previa a productos y evaluación posterior de productos sólo después de selección humana registrada y autorización específica. No define umbrales, algoritmos de producto, ranking ni selección automática. La aceptación científica sigue `REVIEW_REQUIRED`; la cuestión de §9 no se cierra por un PASS técnico.
+- La propuesta conserva CP individuales y agregados separados de GCP, residuos estimado menos referencia en el marco local de la posición estimada, deltas EPSG:25830 separados del RMSE y deltas entre ramas `GCP_P1 - GCP_ONLY`. Reproyección en píxeles y variación de calibración en unidades nativas son diagnósticos, no demostración autónoma de exactitud externa o sobreajuste.
+- Discrepancia registrada: §9 menciona sesgos X/Y/Z/XY/3D; `comparison_core.py` y `optimization_core.py` implementan sesgos sólo x/y/z, con RMSE x/y/z/xy/3d. El protocolo refleja las métricas disponibles, no inventa sesgos escalares ni cambia los cálculos. Revisar la especificación de §9 mediante decisión geomática humana.
+- Dos CP continúan como evidencia exploratoria, sin caracterización espacial robusta ni intervalos inferidos desde n=2. Se conservan h/H y las limitaciones del comparador/API de §§12–13. La evidencia declarada no acredita autenticidad, comparabilidad ni aprobación.
+
+Uso y límites: [guía de preparación offline](palmeri_metashape_adapter_v0_9_0/planning/README.md). Pendientes humanos: completar y revisar contratos reales, aceptar el protocolo y documentar decisiones por fase; no se transfieren autorizaciones históricas a otros vuelos.
