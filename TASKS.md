@@ -2,7 +2,7 @@
 
 Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19; no se han repetido ejecuciones Metashape ni auditorías de datos reales.
 
-Ámbito: la base común publicada de `main` y la feature es `40ca7af`; conserva la integración y la configuración CI Windows. El primer incremento de preparación se versionó en `a2f9497`; el esquema común se prepara para publicación. Consulta `git log -1 --oneline` y `git branch -vv` para las referencias actuales. El CI de `40ca7af` en ambas ramas está comprobado como PASS; véase [FACTS §16](FACTS.md#16-esquema-común-de-campaña-y-comprobación-ci-2026-10-02).
+Ámbito: `main` y la feature conservan los mismos incrementos publicados `a2f9497` y `ed7a73d`, sobre la base `40ca7af`, y la configuración CI Windows. Consulta `git log -1 --oneline` y `git branch -vv` para las referencias actuales. El CI de `ed7a73d` en ambas ramas está comprobado como PASS, con 100 pruebas sin omisiones y 50 fuentes; véase [FACTS §16](FACTS.md#16-esquema-común-de-campaña-y-comprobación-ci-2026-10-02).
 
 ## Integración y controles pendientes
 
@@ -37,7 +37,7 @@ Guía: [preparación offline](palmeri_metashape_adapter_v0_9_0/planning/README.m
 - [x] Comprobar CI Windows de `40ca7af` en `main` y feature: ambas ejecuciones completadas con éxito y evidencia enlazada en FACTS §16.
 - [x] Preparar esquema común documental `common-campaign-1` para RGB P1, con validación de vuelos, referencias a contratos y evidencia declarada por motor; sin importadores ni equivalencia científica.
 - [x] Integrar la tercera plantilla en CLI/checker, añadir 12 pruebas sintéticas y obtener PASS técnico estático de QA y revisión geomática independientes. Checker local: 100 pruebas, una omitida; manifiesto de 50 fuentes correcto.
-- [ ] Publicar los dos incrementos revisados y documentados y comprobar su CI remoto.
+- [x] Publicar los dos incrementos revisados y documentados en ambas ramas mediante fast-forward: `a2f9497` y `ed7a73d`; CI de `ed7a73d` PASS en ambas, 100 pruebas sin omisiones y 50 fuentes verificadas.
 - [ ] Diseñar contratos y mapeos operativos Pix4D con evidencia primaria; la plantilla común no implementa ni valida esas capacidades.
 
 ## Desarrollos offline 2026-10-02 (hito técnico aceptado)

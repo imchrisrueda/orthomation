@@ -4,7 +4,7 @@ Revisión documental: 2026-10-02. Corte de evidencia científica: 2026-09-19.
 
 ## Ámbito del repositorio revisado
 
-La base común publicada de `main` y `feature/validacion-jobxml-y-comparativa-ramas` es `40ca7af`, con controles offline y CI sólo Windows. El primer incremento de preparación se versionó en `a2f9497`; el esquema común se prepara para publicación. Consulta `git log -1 --oneline` y `git branch -vv` para las referencias actuales. CI remoto de `40ca7af`: [main PASS](https://github.com/imchrisrueda/orthomation/actions/runs/36993914467) y [feature PASS](https://github.com/imchrisrueda/orthomation/actions/runs/36993914504), comprobados en esta sesión.
+`main` y `feature/validacion-jobxml-y-comparativa-ramas` conservan los mismos incrementos publicados `a2f9497` y `ed7a73d` desde la base común `40ca7af`, con controles offline y CI sólo Windows. Consulta `git log -1 --oneline` y `git branch -vv` para las referencias actuales. CI remoto de `ed7a73d`: [main PASS](https://github.com/imchrisrueda/orthomation/actions/runs/37066927620) y [feature PASS](https://github.com/imchrisrueda/orthomation/actions/runs/37066927301), comprobados en esta sesión: 100 pruebas sin omisiones y 50 fuentes verificadas.
 
 Hito de integración del 02/10/2026: código, agentes, skills y documentación revisados están versionados e integrados, con cierre documental posterior al fast-forward. No modifica el corte científico ni las autorizaciones vigentes.
 
@@ -27,7 +27,7 @@ Verificación del primer incremento: 17 pruebas nuevas, checker PASS con 88 prue
 
 Hito técnico aceptado tras QA y revisión geomática estáticas independientes: `scripts/common_campaign_core.py` y `planning/_template_common_campaign.json` representan una propuesta RGB P1 `common-campaign-1`. Valida IDs únicos, fechas y referencias por motor/vuelo, metadatos separados de cámara/control y evidencia declarada. Los adaptadores al esquema común son `NOT_IMPLEMENTED` en ambos motores; mapeos `UNVERIFIED`, compatibilidad no comprobada y equivalencia no establecida. La comparación de ramas y el requisito de MASTER/parámetros idénticos se limitan explícitamente a Metashape. No cambia configuraciones científicas ni acepta la campaña 2026.
 
-Resultado local: 12 pruebas nuevas; checker completo PASS con 100 pruebas, una omitida por permisos Windows para symlinks; manifiesto de 50 fuentes correcto. CLI/checker validan tres borradores. Los dos incrementos están preparados para publicación; el resultado CI que ya consta corresponde a `40ca7af`, no a este lote. Su publicación y verificación posteriores se registrarán por commit. Se conservan el corte científico, los bloqueos y el punto seguro de reanudación.
+Resultado local: 12 pruebas nuevas; checker completo PASS con 100 pruebas, una omitida por permisos Windows para symlinks; manifiesto de 50 fuentes correcto. CLI/checker validan tres borradores. Los dos incrementos se publicaron en ambas ramas mediante fast-forward y su CI en `ed7a73d` pasó con 100 pruebas sin omisiones y 50 fuentes verificadas. La diferencia de omisiones corresponde a los permisos locales de symlink, no a una auditoría científica adicional. Este cierre documental registra esas ejecuciones por commit. Se conservan el corte científico, los bloqueos y el punto seguro de reanudación.
 
 ## Revisión de agentes y skills 2026-10-02
 
